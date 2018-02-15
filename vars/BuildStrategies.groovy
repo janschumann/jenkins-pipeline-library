@@ -1,7 +1,7 @@
 import de.audibene.jenkins.pipeline.BuildStrategy
 import de.audibene.jenkins.pipeline.DockerBuildStrategy
 
-BuildStrategy docker(Closure body){
+BuildStrategy call(Closure body){
 
     def config = [:]
     body.resolveStrategy = Closure.DELEGATE_FIRST
