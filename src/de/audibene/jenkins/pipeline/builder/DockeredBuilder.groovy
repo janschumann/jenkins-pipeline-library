@@ -61,6 +61,8 @@ class DockeredBuilder implements ArtifactBuilder {
             throw new IllegalAccessException('There is no required parameter: tag')
         }
 
+        def imageName;
+
         script.node('ecs') {
             wrappedStage('Build', !verbose) {
                 wrappedStage('Prepare', verbose) {
@@ -83,7 +85,7 @@ class DockeredBuilder implements ArtifactBuilder {
                             script.sh script.ecrLogin()
                             dockerImage.push(tag)
                             script.echo "Pushed: ${dockerImage.imageName()}"
-                            return dockerImage.imageName()
+                            imageName =  dockerImage.imageName()
                         }
 
                     }
@@ -91,7 +93,7 @@ class DockeredBuilder implements ArtifactBuilder {
             }
         }
 
-        return null
+        return imageName
     }
 
     def wrappedStage(String name, boolean verbose, Closure body) {
