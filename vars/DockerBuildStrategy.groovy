@@ -28,27 +28,27 @@ class MyDelegate implements Serializable {
 //    }
 
     def build() {
-//        script.node('ecs') {
-//            script.stage('Prepare') {
-//                script.docker.image(env.image).pull()
-//
-//                script.deleteDir()
-//
-//                script.checkout script.scm
-//
-//                script.sh 'ls -lah'
-//            }
-//            script.stage('Build') {
-//                script.docker.image(env.image).inside(env.args) {
-//                    script.sh 'gradle assemble'
-//                }
-//            }
-//            script.stage('Test') {
-//                script.docker.image(env.image).inside(env.args) {
-//                    script.sh 'gradle test'
-//                }
-//            }
-//        }
+        script.node('ecs') {
+            script.stage('Prepare') {
+                script.docker.image(env.image).pull()
+
+                script.deleteDir()
+
+                script.checkout script.scm
+
+                script.sh 'ls -lah'
+            }
+            script.stage('Build') {
+                script.docker.image(env.image).inside(env.args) {
+                    script.sh 'gradle assemble'
+                }
+            }
+            script.stage('Test') {
+                script.docker.image(env.image).inside(env.args) {
+                    script.sh 'gradle test'
+                }
+            }
+        }
     }
 
 
