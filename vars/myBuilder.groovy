@@ -7,6 +7,7 @@ class MyBuilder implements Serializable {
     private final def script
     private final Closure body
 
+    @NonCPS
     MyBuilder(final script, final Closure body) {
         this.script = script
         this.body = body
