@@ -12,9 +12,15 @@ class DockerBuildStrategy implements BuildStrategy {
         this.image = config.image
     }
 
-    def inside(body) {
+    def inside(def image = this.image, body) {
         script.docker.image(image.id).inside(image.args) {
             body()
+        }
+    }
+
+    def withRun(def image, Closure body) {
+        script.docker.image(image.id).withRun(image.args) { container ->
+            body("--link ${container.id}:${image.linkAs}")
         }
     }
 
