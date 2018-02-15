@@ -41,16 +41,14 @@ class DockerBuildStrategy implements BuildStrategy {
                 script.checkout script.scm
                 runStep('prepare')
             }
-            script.stage('Build') {
-                runStep('build')
-            }
             script.stage('Test') {
                 runStep('test')
             }
             script.stage('IT') {
                 runStep('it')
             }
-            script.stage('Docker') {
+            script.stage('Build') {
+                runStep('build')
                 def dockerImage = script.docker.build(artifact.name)
                 script.docker.withRegistry(artifact.registry) {
                     script.sh script.ecrLogin()
