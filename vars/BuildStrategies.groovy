@@ -12,3 +12,5 @@ BuildStrategy docker(Closure body){
     return new DockerBuildStrategy(this, config)
 }
 
+
+return this
