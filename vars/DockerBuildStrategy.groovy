@@ -37,7 +37,6 @@ class MyDelegate implements Serializable {
     def build() {
         script.node('ecs') {
             script.stage('Prepare') {
-                script.sh 'ls -lah /root/.gradle'
                 script.deleteDir()
                 script.checkout script.scm
                 runStep('prepare')
