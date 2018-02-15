@@ -10,11 +10,11 @@ class MyDelegate implements Serializable {
 
     MyDelegate(def script, Closure body) {
         this.script = script
-        body.resolveStrategy = Closure.DELEGATE_FIRST
-        body.delegate = this
-        body()
-
-        script.echo this
+//        body.resolveStrategy = Closure.DELEGATE_FIRST
+//        body.delegate = this
+//        body()
+//
+//        script.echo this
     }
 
 //    def run(body) {
