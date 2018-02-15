@@ -4,16 +4,16 @@ class DockerBuildStrategy implements BuildStrategy {
 
     private final def script
     private final Map<String, Closure> steps
-    private final Map<String, Object> env
+    private final Map<String, Object> image
 
     DockerBuildStrategy(def script, config) {
         this.script = script
         this.steps = config.steps
-        this.env = config.env
+        this.image = config.image
     }
 
     def inside(body) {
-        script.docker.image(env.image).inside(env.args) {
+        script.docker.image(image.id).inside(image.args) {
             body()
         }
     }
