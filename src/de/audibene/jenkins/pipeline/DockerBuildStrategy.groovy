@@ -26,6 +26,25 @@ class DockerBuildStrategy implements BuildStrategy {
         }
     }
 
+    def insideWithPostgres(Map params = [:], Closure body) {
+        String imageVersion = params.version ?: 'latest'
+        String imageId = "postgres:$imageVersion"
+        String username = params.username ?: 'postgres'
+        String password = params.password ?: 'postgres'
+        String args = "-e 'POSTGRES_USER=$username' -e 'POSTGRES_PASSWORD=$password'"
+
+        withRun(id: imageId, args: args, linkAs: 'postgres') { link ->
+
+            inside(id: imageId, args: "$args $link") {
+                script.sh 'while ! pg_isready -h postgres -q; do sleep 1; done'
+            }
+
+            inside(id: image.id, args: "${image.args} $link") {
+                body()
+            }
+        }
+    }
+
     private def runStep(String name) {
         def body = steps[name]
         body.resolveStrategy = Closure.DELEGATE_FIRST
