@@ -5,14 +5,14 @@ MyDelegate call(Closure body){
     body.delegate = config
     body()
 
-    return new MyDelegate(this, body)
+    return new MyDelegate(this, config)
 }
 
 class MyDelegate implements Serializable {
 
     private final def script
-    private final def steps = [:]
-    private final def env = [:]
+    private final def steps
+    private final def env
 
     MyDelegate(def script, config) {
         this.script = script
