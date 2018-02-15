@@ -21,40 +21,38 @@ class MyDelegate implements Serializable {
         script.echo "$this"
     }
 
-//    def run(body) {
-//        script.docker.image(env.image).inside(env.args) {
-//            body()
-//        }
-//    }
+    def run(body) {
+        script.docker.image(env.image).inside(env.args) {
+            body()
+        }
+    }
 
-    def build(body) {
-//        script.node('ecs') {
-//            script.stage('Prepare') {
-//                script.docker.image(env.image).pull()
-//
-//                script.deleteDir()
-//
-//                script.checkout script.scm
-//
-//                script.sh 'ls -lah'
-//            }
-////            script.stage('Build') {
-////                run {
-////                    script.sh 'gradle assemble'
-////                }
-////            }
-////            script.stage('Test') {
-////                run {
-////                    script.sh 'gradle test'
-////                }
-////            }
-//        }
-
+    def build() {
         script.node('ecs') {
-            script.stage('test') {
+            script.stage('Prepare') {
+                script.docker.image(env.image).pull()
+
+                script.deleteDir()
+
                 script.checkout script.scm
-                body()
+
+                script.sh 'ls -lah'
+            }
+            script.stage('Build') {
+                script.docker.image(env.image).inside(env.args) {
+                    script.sh 'gradle assemble'
+                }
+            }
+            script.stage('Test') {
+                script.docker.image(env.image).inside(env.args) {
+                    script.sh 'gradle test'
+                }
             }
         }
+    }
+
+
+    String toString() {
+        return "MyDelegate{steps=$steps, env=$env}"
     }
 }
