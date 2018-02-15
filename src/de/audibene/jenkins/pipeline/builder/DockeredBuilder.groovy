@@ -1,13 +1,13 @@
 package de.audibene.jenkins.pipeline.builder
 
-class DockerBuilder implements ArtifactBuilder {
+class DockeredBuilder implements ArtifactBuilder {
 
     private final def script
     private final Map<String, Closure> steps
     private final Map<String, Object> image
     private final Map<String, Object> artifact
 
-    DockerBuilder(def script, config) {
+    DockeredBuilder(def script, config) {
         this.script = script
         this.steps = config.steps
         this.image = config.image

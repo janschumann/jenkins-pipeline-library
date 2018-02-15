@@ -1,6 +1,6 @@
-import de.audibene.jenkins.pipeline.builder.DockerBuilder
+import de.audibene.jenkins.pipeline.builder.DockeredBuilder
 
-def call(Closure body) {
+def dockered(Closure body) {
     def config = configs(body)
-    return new DockerBuilder(this, config)
+    return new DockeredBuilder(this, config)
 }
