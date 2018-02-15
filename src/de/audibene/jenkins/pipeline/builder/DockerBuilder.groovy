@@ -1,4 +1,4 @@
-package de.audibene.jenkins.pipeline
+package de.audibene.jenkins.pipeline.builder
 
 class DockerBuilder implements ArtifactBuilder {
 
