@@ -77,13 +77,13 @@ class DockeredBuilder implements ArtifactBuilder {
                 wrappedStage('Build', verbose) {
                     runStep('build')
                     def dockerImage = script.docker.build(artifact.name)
-
+                    script.echo "Builded: $dockerImage"
                     if (push) {
                         script.docker.withRegistry(artifact.registry) {
                             script.sh script.ecrLogin()
                             dockerImage.push(tag)
                         }
-                        echo "Builded and pushed: $dockerImage"
+                        script.echo "Pushed: $dockerImage"
                         return dockerImage.id
                     }
                 }
