@@ -83,6 +83,7 @@ class DockeredBuilder implements ArtifactBuilder {
                             script.sh script.ecrLogin()
                             dockerImage.push(tag)
                         }
+                        echo "$dockerImage"
                         return dockerImage.id
                     }
                 }
