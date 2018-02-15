@@ -5,6 +5,6 @@ interface BuildStrategy extends Serializable{
     /**
      * @return built artifact id
      */
-    String build()
+    String build(String tag)
 
 }

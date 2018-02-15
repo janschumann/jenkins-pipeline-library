@@ -5,11 +5,13 @@ class DockerBuildStrategy implements BuildStrategy {
     private final def script
     private final Map<String, Closure> steps
     private final Map<String, Object> image
+    private final Map<String, Object> artifact
 
     DockerBuildStrategy(def script, config) {
         this.script = script
         this.steps = config.steps
         this.image = config.image
+        this.artifact = config.artifact
     }
 
     def inside(def image = this.image, body) {
@@ -32,7 +34,7 @@ class DockerBuildStrategy implements BuildStrategy {
     }
 
     @Override
-    String build() {
+    String build(String tag) {
         script.node('ecs') {
             script.stage('Prepare') {
                 script.deleteDir()
@@ -49,7 +51,11 @@ class DockerBuildStrategy implements BuildStrategy {
                 runStep('it')
             }
             script.stage('Docker') {
-                runStep('docker')
+                def dockerImage = script.docker.build(artifact.name)
+                script.docker.withRegistry(artifact.registry) {
+                    script.sh script.ecrLogin()
+                    dockerImage.push(tag)
+                }
             }
         }
 
