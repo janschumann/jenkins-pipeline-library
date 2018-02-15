@@ -45,6 +45,12 @@ class DockerBuildStrategy implements BuildStrategy {
             script.stage('Test') {
                 runStep('test')
             }
+            script.stage('IT') {
+                runStep('it')
+            }
+            script.stage('Docker') {
+                runStep('docker')
+            }
         }
 
         return null
