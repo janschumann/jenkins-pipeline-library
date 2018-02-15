@@ -9,6 +9,7 @@ def threeFlow(body) {
         builder.build()
     } else {
         echo 'Snapshot Flow'
-        builder.build(push: true, tag: tag, verbose: false)
+        def artifact = builder.build(push: true, tag: tag, verbose: false)
+        echo "Artifact id: $artifact"
     }
 }
