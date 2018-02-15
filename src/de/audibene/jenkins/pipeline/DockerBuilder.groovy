@@ -56,7 +56,7 @@ class DockerBuilder implements ArtifactBuilder {
     String build(Map parameters) {
         boolean verbose = parameters.get('verbose', true)
         boolean push = parameters.get('push', false)
-        String tag = parameters.computeIfAbsent('tag', {
+        String tag = parameters.computeIfAbsent('tag', { key ->
             if (push) {
                 throw new IllegalAccessException('There is no required parameter: tag')
             }
