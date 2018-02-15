@@ -37,13 +37,9 @@ class MyDelegate implements Serializable {
     def build() {
         script.node('ecs') {
             script.stage('Prepare') {
-                script.docker.image(env.image).pull()
-
                 script.deleteDir()
-
                 script.checkout script.scm
-
-                script.sh 'ls -lah'
+                runStep('prepare')
             }
             script.stage('Build') {
                 runStep('build')
