@@ -21,7 +21,7 @@ class MyDelegate implements Serializable {
         this.env = config.env
     }
 
-    def myRun(body) {
+    def inside(body) {
         script.docker.image(env.image).inside(env.args) {
             body()
         }
