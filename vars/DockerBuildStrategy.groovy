@@ -1,31 +1,49 @@
 def call(Closure body) {
-    config = [:]
-    body.resolveStrategy = Closure.DELEGATE_FIRST
-    body.delegate = config
-    body(this)
-
-    echo "DockerBuildStrategy.config: $config"
+    return new MyDelegate(this, body)
 }
 
-def run(Closure body) {
-    docker.image(config.env.image).inside(config.env.args) {
+class MyDelegate implements Serializable {
+
+    private final def script
+    private final def steps = [:]
+    private final def env = [:]
+
+    MyDelegate(def script, Closure body) {
+        this.script = script
+        body.resolveStrategy = Closure.DELEGATE_FIRST
+        body.delegate = this
         body()
+
+        script.echo this
+    }
+
+    def run(body) {
+//        script.docker.image(env.image).inside(env.args) {
+//            body()
+//        }
+    }
+
+    def build() {
+        script.node('ecs') {
+            script.stage('Prepare') {
+                script.docker.image(env.image).pull()
+
+                script.deleteDir()
+
+                script.checkout script.scm
+
+                script.sh 'ls -lah'
+            }
+//            script.stage('Build') {
+//                run {
+//                    script.sh 'gradle assemble'
+//                }
+//            }
+//            script.stage('Test') {
+//                run {
+//                    script.sh 'gradle test'
+//                }
+//            }
+        }
     }
 }
-
-def build() {
-    node('ecs') {
-        stage('Prepare') {
-            docker.image(config.env.image).pull()
-            checkout scm
-        }
-        stage('Build') {
-            config.steps.build()
-        }
-        stage('Test') {
-            config.steps.test()
-        }
-    }
-}
-
-return this
