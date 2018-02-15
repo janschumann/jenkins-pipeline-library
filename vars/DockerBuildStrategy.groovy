@@ -19,7 +19,6 @@ class MyDelegate implements Serializable {
         this.script = script
         this.steps = config.steps
         this.env = config.env
-        script.echo "$this"
     }
 
 //    def run(body) {
