@@ -5,7 +5,7 @@ MyDelegate call(Closure body){
     body.delegate = config
     body()
 
-    echo "Config $this"
+    echo "Config $config"
     return new MyDelegate(this, config)
 }
 
