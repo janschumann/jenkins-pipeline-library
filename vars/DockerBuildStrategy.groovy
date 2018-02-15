@@ -1,3 +1,4 @@
+@NonCPS
 def call(Closure body) {
     return new MyDelegate(this, body)
 }
@@ -8,7 +9,6 @@ class MyDelegate implements Serializable {
     private final def steps = [:]
     private final def env = [:]
 
-    @NonCPS
     MyDelegate(def script, Closure body) {
         this.script = script
         body.resolveStrategy = Closure.DELEGATE_FIRST
