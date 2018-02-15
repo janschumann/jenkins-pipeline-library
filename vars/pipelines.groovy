@@ -7,8 +7,7 @@ def threeFlow(body) {
     if (env.BRANCH_NAME.startsWith("PR-")) {
         echo 'PR Flow'
         config.buildStrategy.build()
-    }
-    else if (env.BRANCH_NAME == 'master') {
+    } else {
         echo 'Snapshot Flow'
         config.buildStrategy.build(push: true, tag: tag, verbose: false)
     }
