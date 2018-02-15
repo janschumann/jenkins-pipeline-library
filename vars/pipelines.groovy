@@ -4,7 +4,7 @@ def threeFlow(body) {
     def tag = Long.toString(new Date().time, Character.MAX_RADIX)
 
 
-    if (env.BRANCH_NAME.startWith("PR-")) {
+    if (env.BRANCH_NAME.startsWith("PR-")) {
         echo 'PR Flow'
         config.buildStrategy.build()
     }
