@@ -5,6 +5,7 @@ MyDelegate call(Closure body){
     body.delegate = config
     body()
 
+    script.echo "COnfig $this"
     return new MyDelegate(this, config)
 }
 
@@ -21,11 +22,11 @@ class MyDelegate implements Serializable {
         script.echo "$this"
     }
 
-    def run(body) {
-        script.docker.image(env.image).inside(env.args) {
-            body()
-        }
-    }
+//    def run(body) {
+//        script.docker.image(env.image).inside(env.args) {
+//            body()
+//        }
+//    }
 
     def build() {
 //        script.node('ecs') {
