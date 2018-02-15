@@ -1,4 +1,4 @@
 def call(body) {
-    def config = Config(body)
+    def config = configs(body)
     config.buildStrategy.build()
 }
