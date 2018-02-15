@@ -21,11 +21,11 @@ class MyDelegate implements Serializable {
         this.env = config.env
     }
 
-//    def run(body) {
-//        script.docker.image(env.image).inside(env.args) {
-//            body()
-//        }
-//    }
+    def run(body) {
+        script.docker.image(env.image).inside(env.args) {
+            body()
+        }
+    }
 
     def build() {
         script.node('ecs') {
