@@ -39,12 +39,12 @@ class MyDelegate implements Serializable {
                 script.sh 'ls -lah'
             }
             script.stage('Build') {
-                script.docker.image(env.image).inside(env.args) {
+                run {
                     script.sh 'gradle assemble'
                 }
             }
             script.stage('Test') {
-                script.docker.image(env.image).inside(env.args) {
+                run {
                     script.sh 'gradle test'
                 }
             }
