@@ -1,8 +1,11 @@
-@NonCPS
 MyDelegate call(Closure body){
-    def delegate = new MyDelegate(this, body)
-    echo "Delegate: $delegate"
-    return delegate
+
+    def config = [:]
+    body.resolveStrategy = Closure.DELEGATE_FIRST
+    body.delegate = config
+    body()
+
+    return new MyDelegate(this, body)
 }
 
 class MyDelegate implements Serializable {
@@ -11,12 +14,10 @@ class MyDelegate implements Serializable {
     private final def steps = [:]
     private final def env = [:]
 
-    MyDelegate(def script, Closure body) {
+    MyDelegate(def script, config) {
         this.script = script
-//        body.resolveStrategy = Closure.DELEGATE_FIRST
-//        body.delegate = this
-//        body()
-
+        this.steps = config.steps
+        this.env = config.env
         script.echo "$this"
     }
 
