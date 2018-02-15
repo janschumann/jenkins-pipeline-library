@@ -1,21 +1,12 @@
-MyDelegate call(Closure body){
+package de.audibene.jenkins.pipeline
 
-    def config = [:]
-    body.resolveStrategy = Closure.DELEGATE_FIRST
-    body.delegate = config
-    body()
-
-    echo "Config $config"
-    return new MyDelegate(this, config)
-}
-
-class MyDelegate implements Serializable {
+class DockerBuildStrategy implements BuildStrategy {
 
     private final def script
     private final Map<String, Closure> steps
     private final Map<String, Object> env
 
-    MyDelegate(def script, config) {
+    DockerBuildStrategy(def script, config) {
         this.script = script
         this.steps = config.steps
         this.env = config.env
@@ -34,7 +25,8 @@ class MyDelegate implements Serializable {
         body()
     }
 
-    def build() {
+    @Override
+    String build() {
         script.node('ecs') {
             script.stage('Prepare') {
                 script.deleteDir()
@@ -48,10 +40,7 @@ class MyDelegate implements Serializable {
                 runStep('test')
             }
         }
-    }
 
-
-    String toString() {
-        return "MyDelegate{steps=$steps, env=$env}"
+        return null
     }
 }
