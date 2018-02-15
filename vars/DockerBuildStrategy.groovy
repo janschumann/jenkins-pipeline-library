@@ -17,7 +17,7 @@ class MyDelegate implements Serializable {
 //        body.delegate = this
 //        body()
 
-        script.echo this
+        script.echo "$this"
     }
 
 //    def run(body) {
