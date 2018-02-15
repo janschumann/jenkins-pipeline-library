@@ -1,13 +1,13 @@
 package de.audibene.jenkins.pipeline
 
-class DockerBuildStrategy implements BuildStrategy {
+class DockerBuilder implements ArtifactBuilder {
 
     private final def script
     private final Map<String, Closure> steps
     private final Map<String, Object> image
     private final Map<String, Object> artifact
 
-    DockerBuildStrategy(def script, config) {
+    DockerBuilder(def script, config) {
         this.script = script
         this.steps = config.steps
         this.image = config.image
@@ -53,29 +53,52 @@ class DockerBuildStrategy implements BuildStrategy {
     }
 
     @Override
-    String build(String tag) {
+    String build(Map parameters) {
+        boolean verbose = parameters.get('verbose', true)
+        boolean push = parameters.get('push', false)
+        String tag = parameters.computeIfAbsent('tag', {
+            if (push) {
+                throw new IllegalAccessException('There is no required parameter: tag')
+            }
+        })
+
         script.node('ecs') {
-            script.stage('Prepare') {
-                script.deleteDir()
-                script.checkout script.scm
-                runStep('prepare')
-            }
-            script.stage('Test') {
-                runStep('test')
-            }
-            script.stage('IT') {
-                runStep('it')
-            }
-            script.stage('Build') {
-                runStep('build')
-                def dockerImage = script.docker.build(artifact.name)
-                script.docker.withRegistry(artifact.registry) {
-                    script.sh script.ecrLogin()
-                    dockerImage.push(tag)
+            wrappedStage('Build', !verbose) {
+                wrappedStage('Prepare', verbose) {
+                    script.deleteDir()
+                    script.checkout script.scm
+                    runStep('prepare')
+                }
+                wrappedStage('Test', verbose) {
+                    runStep('test')
+                }
+                wrappedStage('IT', verbose) {
+                    runStep('it')
+                }
+                wrappedStage('Build', verbose) {
+                    runStep('build')
+                    def dockerImage = script.docker.build(artifact.name)
+
+                    if (push) {
+                        script.docker.withRegistry(artifact.registry) {
+                            script.sh script.ecrLogin()
+                            dockerImage.push(tag)
+                        }
+                    }
                 }
             }
         }
 
         return null
+    }
+
+    def wrappedStage(String name, boolean verbose, Closure body) {
+        if (verbose) {
+            script.stage(name) {
+                body()
+            }
+        } else {
+            body()
+        }
     }
 }

@@ -1,6 +1,6 @@
-import de.audibene.jenkins.pipeline.DockerBuildStrategy
+import de.audibene.jenkins.pipeline.DockerBuilder
 
 def docker(Closure body) {
     def config = configs(body)
-    return new DockerBuildStrategy(this, config)
+    return new DockerBuilder(this, config)
 }

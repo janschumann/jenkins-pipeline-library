@@ -1,10 +1,10 @@
 package de.audibene.jenkins.pipeline
 
-interface BuildStrategy extends Serializable{
+interface ArtifactBuilder extends Serializable{
 
     /**
      * @return built artifact id
      */
-    String build(String tag)
+    String build(Map parameters)
 
 }
