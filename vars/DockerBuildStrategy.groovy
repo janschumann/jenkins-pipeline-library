@@ -12,8 +12,8 @@ MyDelegate call(Closure body){
 class MyDelegate implements Serializable {
 
     private final def script
-    private final def steps
-    private final def env
+    private final Map<String, Closure> steps
+    private final Map<String, Object> env
 
     MyDelegate(def script, config) {
         this.script = script
@@ -21,10 +21,17 @@ class MyDelegate implements Serializable {
         this.env = config.env
     }
 
-    def run(body) {
+    def myRun(body) {
         script.docker.image(env.image).inside(env.args) {
             body()
         }
+    }
+
+    private def runStep(String name) {
+        def body = steps[name]
+        body.resolveStrategy = Closure.DELEGATE_FIRST
+        body.delegate = this
+        body()
     }
 
     def build() {
@@ -39,14 +46,10 @@ class MyDelegate implements Serializable {
                 script.sh 'ls -lah'
             }
             script.stage('Build') {
-                run {
-                    script.sh 'gradle assemble'
-                }
+                runStep('build')
             }
             script.stage('Test') {
-                run {
-                    script.sh 'gradle test'
-                }
+                runStep('test')
             }
         }
     }
