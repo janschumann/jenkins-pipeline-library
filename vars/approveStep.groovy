@@ -21,9 +21,12 @@ private def getApprove(String name, time, unit, message, timeoutAs) {
             timeout(time: time, unit: unit) {
                 input(message)
             }
+            echo "Approved"
             return [result: true, userName: getApprover()]
         } catch (FlowInterruptedException e) {
+            echo "Exception"
             def rejectedBy = getRejectedBy(e)
+            echo "Rejector $rejectedBy"
             def result = rejectedBy != "SYSTEM" || timeoutAs
             return [result: result, userName: rejectedBy]
         }
