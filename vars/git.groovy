@@ -5,7 +5,6 @@ def call(body) {
 class Git {
     private final def script
     private final Map config
-    private String upstream
 
     Git(script, config) {
         this.script = script
@@ -15,11 +14,11 @@ class Git {
 
     def tag(tag) {
         execute "git tag -a $tag -m 'create tag: $tag'"
-        execute "git push $upstream --tags"
+        execute "git push origin --tags"
     }
 
     def branch(branch) {
-        execute "git push $upstream HEAD:$branch"
+        execute "git push origin HEAD:$branch"
     }
 
     def execute(command) {
