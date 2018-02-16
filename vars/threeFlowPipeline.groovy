@@ -1,3 +1,5 @@
+import de.audibene.jenkins.pipeline.builder.ArtifactBuilder
+import de.audibene.jenkins.pipeline.deployer.ArtifactDeployer
 import de.audibene.jenkins.pipeline.promoter.BuildPromoter
 
 import static java.util.Objects.requireNonNull
@@ -7,9 +9,9 @@ def call(body) {
     def config = configs(body)
 
     def tag = Long.toString(new Date().time, Character.MAX_RADIX)
-    def builder = requireNonNull(config.builder, 'threeFlowPipeline.builder')
-    def deployer = requireNonNull(config.deployer, 'threeFlowPipeline.deployer')
-    def promoter = config.promoter ?: new BuildPromoter(this)
+    def builder = requireNonNull(config.builder, 'threeFlowPipeline.builder') as ArtifactBuilder
+    def deployer = requireNonNull(config.deployer, 'threeFlowPipeline.deployer') as ArtifactDeployer
+    def promoter = new BuildPromoter(this)
 
     if (env.BRANCH_NAME.startsWith('PR-')) {
         echo 'PR Flow'
