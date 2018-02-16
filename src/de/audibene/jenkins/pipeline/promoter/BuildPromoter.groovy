@@ -1,7 +1,5 @@
 package de.audibene.jenkins.pipeline.promoter
 
-import static de.audibene.jenkins.pipeline.Objects.requireNonNull
-
 class BuildPromoter {
 
     private final def script
@@ -13,7 +11,7 @@ class BuildPromoter {
     }
 
     def promote(Map params) {
-        def branch = params.branch ?: requireNonNull('branch')
+        def branch = Objects.requireNonNull(params.branch, 'BuildPromoter.branch')
 
         script.approveStep("Promote to ${branch}?")
 

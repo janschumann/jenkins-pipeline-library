@@ -1,6 +1,6 @@
 package de.audibene.jenkins.pipeline.builder
 
-import static de.audibene.jenkins.pipeline.Objects.requireNonNull
+import static java.util.Objects.requireNonNull
 
 class DockerfileBuilder implements ArtifactBuilder {
 
@@ -9,11 +9,11 @@ class DockerfileBuilder implements ArtifactBuilder {
     private final Map<String, Object> image
     private final Map<String, Object> artifact
 
-    DockerfileBuilder(script, config) {
-        this.script = script
-        this.steps = config.steps ?: requireNonNull('steps') as Map
-        this.image = config.image ?: requireNonNull('image') as Map
-        this.artifact = config.artifact ?: requireNonNull('artifact') as Map
+    DockerfileBuilder(script, config = [:]) {
+        this.script = requireNonNull(script, 'DockerfileBuilder.script')
+        this.steps = requireNonNull(config.steps, 'DockerfileBuilder.steps') as Map
+        this.image = requireNonNull(config.image, 'DockerfileBuilder.image') as Map
+        this.artifact = requireNonNull(config.artifact, 'DockerfileBuilder.artifact') as Map
     }
 
     def inside(image = this.image, body) {
@@ -58,7 +58,7 @@ class DockerfileBuilder implements ArtifactBuilder {
     String build(Map parameters) {
         boolean verbose = parameters.get('verbose', true)
         boolean push = parameters.get('push', false)
-        String tag = parameters.tag ?: requireNonNull('tag', push)
+        String tag = push ? requireNonNull(parameters.tag, 'DockerfileBuilder#build(parameters.tag)') : null
 
         def imageName = null
 
