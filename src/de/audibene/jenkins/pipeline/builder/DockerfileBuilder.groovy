@@ -66,7 +66,6 @@ class DockerfileBuilder implements ArtifactBuilder {
                 script.buildStep('Prepare', verbose) {
                     script.deleteDir()
                     script.checkout script.scm
-                    git.tag(tag)
                     runStep('prepare')
                 }
                 script.buildStep('Test', verbose) {
