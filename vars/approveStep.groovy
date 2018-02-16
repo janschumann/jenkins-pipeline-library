@@ -9,7 +9,8 @@ def call(String name, Map params = [:]) {
 
     def approve = getApprove(name, time, unit, message, timeoutAs)
 
-    if (!approve) {
+    echo "Receive result: $approve"
+    if (!approve.result) {
         env.BUILD_FASE = 'STOPPED'
     }
 }
@@ -20,7 +21,6 @@ private def getApprove(String name, time, unit, message, timeoutAs) {
             timeout(time: time, unit: unit) {
                 input(message)
             }
-
             return [result: true, userName: getApprover()]
         } catch (FlowInterruptedException e) {
             def rejectedBy = getRejectedBy(e)
