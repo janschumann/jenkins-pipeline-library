@@ -1,6 +1,7 @@
 def call(body) {
     this.git = new Git(this, configs(body))
     git.initialize()
+    return git
 }
 
 class Git {
