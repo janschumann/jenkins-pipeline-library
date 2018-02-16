@@ -13,26 +13,19 @@ class Git {
         this.script.git = this
     }
 
-    def initialize() {
-        script.sh "git config user.name '${config.username}'"
-        script.sh "git config user.email '${config.email}'"
-        upstream = "git@github.com:Audibene-GMBH/audibene-microservice.git"
-    }
-
     def tag(tag) {
-        sh "git tag -a $tag -m 'create tag: $tag'"
-        sh "git push $upstream --tags"
+        execute "git tag -a $tag -m 'create tag: $tag'"
+        execute "git push $upstream --tags"
     }
 
     def branch(branch) {
-        execute { script.sh "git push $upstream HEAD:$branch" }
+        execute "git push $upstream HEAD:$branch"
     }
 
-    def sh(command) {
-        initialize()
-        script.sshagent([config.credentials]){
-            script.sh command
-        }
+    def execute(command) {
+        script.sh "git config user.name '${config.username}'"
+        script.sh "git config user.email '${config.email}'"
+        script.sh command
     }
 
 }
