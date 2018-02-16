@@ -1,12 +1,14 @@
 import de.audibene.jenkins.pipeline.promoter.BuildPromoter
 
+import static java.util.Objects.requireNonNull
+
 
 def call(body) {
     def config = configs(body)
 
     def tag = Long.toString(new Date().time, Character.MAX_RADIX)
-    def builder = Objects.requireNonNull(config.builder, 'threeFlowPipeline.builder')
-    def deployer = Objects.requireNonNull(config.deployer, 'threeFlowPipeline.deployer')
+    def builder = requireNonNull(config.builder, 'threeFlowPipeline.builder')
+    def deployer = requireNonNull(config.deployer, 'threeFlowPipeline.deployer')
     def promoter = config.promoter ?: new BuildPromoter(this)
 
     if (env.BRANCH_NAME.startsWith('PR-')) {

@@ -11,7 +11,7 @@ class BuildPromoter {
     }
 
     def promote(Map params) {
-        def branch = Objects.requireNonNull(params.branch, 'BuildPromoter.branch')
+        def branch = params.branch
 
         script.approveStep("Promote to ${branch}?")
 

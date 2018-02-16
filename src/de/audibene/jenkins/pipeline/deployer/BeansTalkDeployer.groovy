@@ -1,22 +1,19 @@
 package de.audibene.jenkins.pipeline.deployer
 
-import static java.util.Objects.requireNonNull
-
-
 class BeansTalkDeployer implements ArtifactDeployer {
 
     private final def script
     private final Map params
 
-    BeansTalkDeployer(def script, params = [:]) {
-        this.script = requireNonNull(script, 'BeansTalkDeployer.script')
-        this.params = requireNonNull(params, 'BeansTalkDeployer.params') as Map
+    BeansTalkDeployer(def script, params) {
+        this.script = script
+        this.params = params
     }
 
     @Override
     def deploy(final Map params) {
-        def artifact = requireNonNull(params.artifact, 'BeansTalkDeployer#deploy(params.artifact)')
-        def environment = requireNonNull(params.environment, 'BeansTalkDeployer#deploy(params.environment)')
+        def artifact = params.artifact
+        def environment = params.environment
 
         script.approveStep("Deploy to ${environment}?")
 
