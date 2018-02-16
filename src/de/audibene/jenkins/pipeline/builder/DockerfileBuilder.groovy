@@ -1,32 +1,32 @@
 package de.audibene.jenkins.pipeline.builder
 
-class DockeredBuilder implements ArtifactBuilder {
+class DockerfileBuilder implements ArtifactBuilder {
 
     private final def script
     private final Map<String, Closure> steps
     private final Map<String, Object> image
     private final Map<String, Object> artifact
 
-    DockeredBuilder(def script, config) {
+    DockerfileBuilder(script, config) {
         this.script = script
         this.steps = config.steps
         this.image = config.image
         this.artifact = config.artifact
     }
 
-    def inside(def image = this.image, body) {
+    def inside(image = this.image, body) {
         script.docker.image(image.id).inside(image.args) {
             body()
         }
     }
 
-    def withRun(def image, Closure body) {
+    def withRun(image, body) {
         script.docker.image(image.id).withRun(image.args) { container ->
             body("--link ${container.id}:${image.linkAs}")
         }
     }
 
-    def insideWithPostgres(Map params = [:], Closure body) {
+    def insideWithPostgres(def params = [:], body) {
         String imageVersion = params.version ?: 'latest'
         String imageId = "postgres:$imageVersion"
         String username = params.username ?: 'postgres'
@@ -61,7 +61,7 @@ class DockeredBuilder implements ArtifactBuilder {
             throw new IllegalAccessException('There is no required parameter: tag')
         }
 
-        def imageName;
+        def imageName = null
 
         script.node('ecs') {
             wrappedStage('Build', !verbose) {
@@ -79,13 +79,11 @@ class DockeredBuilder implements ArtifactBuilder {
                 wrappedStage('Build', verbose) {
                     runStep('build')
                     def dockerImage = script.docker.build(artifact.name)
-                    script.echo "Builded: ${dockerImage.imageName()}"
                     if (push) {
                         script.docker.withRegistry(artifact.registry) {
                             script.sh script.ecrLogin()
                             dockerImage.push(tag)
-                            script.echo "Pushed: ${dockerImage.imageName()}"
-                            imageName =  dockerImage.imageName()
+                            imageName = "${dockerImage.imageName()}:$tag"
                         }
 
                     }
