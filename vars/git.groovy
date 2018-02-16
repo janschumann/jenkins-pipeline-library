@@ -20,10 +20,8 @@ class Git {
     }
 
     def tag(tag) {
-        execute {
-            script.sh "git tag -a $tag -m 'create tag: $tag'"
-            script.sh "git push $upstream --tags"
-        }
+        execute { script.sh "git tag -a $tag -m 'create tag: $tag'" }
+        execute { script.sh "git push $upstream --tags" }
     }
 
     def branch(branch) {
