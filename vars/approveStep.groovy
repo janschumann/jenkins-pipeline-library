@@ -11,7 +11,7 @@ def call(String name, Map params = [:]) {
     def approve = getApprove(name, time, unit, message, timeoutAs)
 
     if (!approve.result) {
-        currentState.result = 'NOT_BUILT'
+        currentStage.result = 'NOT_BUILT'
         currentBuild.result = 'ABORTED'
         throw new ApproveStepRejected("Rejected by ${approve.userName}")
     }
