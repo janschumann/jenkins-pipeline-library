@@ -56,9 +56,9 @@ class DockerfileBuilder implements ArtifactBuilder {
 
     @Override
     String build(Map parameters) {
-        def verbose = parameters.verbose ?: true
-        def push = parameters.push ?: false
-        def tag = parameters.tag ?: requireNonNull('tag', push)
+        boolean verbose = parameters.get('verbose', true)
+        boolean push = parameters.get('push', false)
+        String tag = parameters.tag ?: requireNonNull('tag', push)
 
         def imageName = null
 
