@@ -1,8 +1,8 @@
+#!groovy
+
 import de.audibene.jenkins.pipeline.builder.ArtifactBuilder
 import de.audibene.jenkins.pipeline.deployer.ArtifactDeployer
 import de.audibene.jenkins.pipeline.promoter.BuildPromoter
-
-import static java.util.Objects.requireNonNull
 
 
 def call(body) {

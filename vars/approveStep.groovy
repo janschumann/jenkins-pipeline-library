@@ -1,3 +1,6 @@
+#!groovy
+import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
+
 def call(String name, Map params = [:]) {
     def time = params.get('time', Long.MAX_VALUE)
     def unit = params.get('unit', Long.DAYS)

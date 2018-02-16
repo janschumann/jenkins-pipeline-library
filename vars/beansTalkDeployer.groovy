@@ -1,3 +1,4 @@
+#!groovy
 import de.audibene.jenkins.pipeline.deployer.BeansTalkDeployer
 
 def call(Closure body) {
