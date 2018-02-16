@@ -53,7 +53,7 @@ class DockerfileBuilder implements ArtifactBuilder {
     }
 
     @Override
-    String build(Map parameters) {
+    String build(Map parameters = [:]) {
         boolean verbose = parameters.get('verbose', true)
         boolean push = parameters.get('push', false)
         String tag = parameters.tag

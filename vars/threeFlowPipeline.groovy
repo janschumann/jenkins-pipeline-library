@@ -24,12 +24,12 @@ def call(body) {
             deployer.deploy(artifact: artifact, environment: 'develop')
             promoter.promote(branch: 'candidate')
         } else if (env.BRANCH_NAME == 'candidate') {
-            echo 'Snapshot Flow'
+            echo 'Candidate Flow'
             def artifact = builder.build(push: true, tag: "candidate-$tag", verbose: false)
             deployer.deploy(artifact: artifact, environment: 'staging')
             promoter.promote(branch: 'release')
         } else if (env.BRANCH_NAME == 'release') {
-            echo 'Snapshot Flow'
+            echo 'Release Flow'
             def artifact = builder.build(push: true, tag: "release-$tag", verbose: false)
             deployer.deploy(artifact: artifact, environment: 'production')
         }
