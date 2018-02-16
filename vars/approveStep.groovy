@@ -10,8 +10,11 @@ def call(String name, Map params = [:]) {
     def approve = getApprove(name, time, unit, message, timeoutAs)
 
     if (!approve.result) {
-        currentBuild.result = 'ABORTED'
-        error("Rejected by ${approve.userName}")
+        try {
+            error("Rejected by ${approve.userName}")
+        } finally {
+            currentBuild.result = 'SUCCESS'
+        }
     }
 }
 
