@@ -12,6 +12,7 @@ def call(body) {
     def tag = Long.toString(new Date().time, Character.MAX_RADIX)
     def builder = config.builder as ArtifactBuilder
     def deployer = config.deployer as ArtifactDeployer
+    def git = config.git
     def promoter = new BuildPromoter(this)
 
     try {
@@ -20,17 +21,17 @@ def call(body) {
             builder.build()
         } else if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME.startsWith('test-')) {
             echo 'Snapshot Flow'
-            def artifact = builder.build(push: true, tag: "snapshot-$tag", verbose: false)
+            def artifact = builder.build(push: true, tag: "snapshot-$tag", verbose: false, git: git)
             deployer.deploy(artifact: artifact, environment: 'develop')
             promoter.promote(branch: 'candidate')
         } else if (env.BRANCH_NAME == 'candidate') {
             echo 'Candidate Flow'
-            def artifact = builder.build(push: true, tag: "candidate-$tag", verbose: false)
+            def artifact = builder.build(push: true, tag: "candidate-$tag", verbose: false, git: git)
             deployer.deploy(artifact: artifact, environment: 'staging')
             promoter.promote(branch: 'release')
         } else if (env.BRANCH_NAME == 'release') {
             echo 'Release Flow'
-            def artifact = builder.build(push: true, tag: "release-$tag", verbose: false)
+            def artifact = builder.build(push: true, tag: "release-$tag", verbose: false, git: git)
             deployer.deploy(artifact: artifact, environment: 'production')
         }
     } catch (ApproveStepRejected ignore) {
