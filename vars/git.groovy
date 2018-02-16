@@ -24,7 +24,9 @@ class Git {
     def execute(command) {
         script.sh "git config user.name '${config.username}'"
         script.sh "git config user.email '${config.email}'"
-        script.sh command
+        script.sshagent([config.credentials]) {
+            script.sh command
+        }
     }
 
 }
