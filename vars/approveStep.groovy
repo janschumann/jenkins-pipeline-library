@@ -14,7 +14,7 @@ def call(String name, Map params = [:]) {
         echo "Result is $approve"
 
         if (!approve.result) {
-            stageStatus= 'NOT_EXECUTED'
+            stageStatus= 'FAILED_AND_CONTINUED'
             throw new ApproveStepRejected("Rejected by ${approve.userName}")
         }
     }
