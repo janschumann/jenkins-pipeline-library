@@ -1,7 +1,6 @@
 def call(body) {
     this.git = new Git(this, configs(body))
     git.initialize()
-    return git
 }
 
 class Git {
@@ -12,6 +11,7 @@ class Git {
     Git(script, config) {
         this.script = script
         this.config = config
+        this.script.git = this
     }
 
     def initialize() {
