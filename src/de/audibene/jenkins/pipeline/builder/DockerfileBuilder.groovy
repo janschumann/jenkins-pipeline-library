@@ -61,7 +61,7 @@ class DockerfileBuilder implements ArtifactBuilder {
 
         def imageName = null
 
-        script.node('ecs') {
+        script.buildNode('ecs') {
             script.buildStep('Build', !verbose) {
                 script.buildStep('Prepare', verbose) {
                     script.deleteDir()
