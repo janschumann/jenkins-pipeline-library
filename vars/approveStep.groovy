@@ -1,4 +1,5 @@
 #!groovy
+import de.audibene.jenkins.pipeline.exception.ApproveStepRejected
 import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
 def call(String name, Map params = [:]) {
@@ -10,11 +11,7 @@ def call(String name, Map params = [:]) {
     def approve = getApprove(name, time, unit, message, timeoutAs)
 
     if (!approve.result) {
-        try {
-            error("Rejected by ${approve.userName}")
-        } finally {
-            currentBuild.result = 'SUCCESS'
-        }
+        throw new ApproveStepRejected("Rejected by ${approve.userName}")
     }
 }
 
