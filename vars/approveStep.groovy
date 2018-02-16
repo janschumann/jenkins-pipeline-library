@@ -2,7 +2,7 @@
 import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
 def call(String name, Map params = [:]) {
-    def time = params.get('time', Long.MAX_VALUE)
+    def time = params.get('time', 365)
     def unit = params.get('unit', 'DAYS')
     def message = params.message ?: name
     def timeoutAs = params.get('timeoutAs', false)
