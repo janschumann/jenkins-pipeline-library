@@ -17,13 +17,9 @@ class BeansTalkDeployer implements ArtifactDeployer {
         def artifact = params.artifact ?: requireNonNull('artifact')
         def environment = params.environment ?: requireNonNull('environment')
 
-        script.stage("Deploy to ${environment}?") {
+        script.approveStep("Deploy to ${environment}?")
 
-        }
-
-        script.input("Deploy to ${environment}?")
-
-        script.stage("Deploy to ${environment}") {
+        script.buildStep("Deploy to ${environment}") {
             script.echo "TODO: deploy $artifact to $environment"
         }
     }

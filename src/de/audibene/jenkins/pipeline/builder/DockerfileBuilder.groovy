@@ -63,19 +63,19 @@ class DockerfileBuilder implements ArtifactBuilder {
         def imageName = null
 
         script.node('ecs') {
-            wrappedStage('Build', !verbose) {
-                wrappedStage('Prepare', verbose) {
+            script.buildStep('Build', !verbose) {
+                script.buildStep('Prepare', verbose) {
                     script.deleteDir()
                     script.checkout script.scm
                     runStep('prepare')
                 }
-                wrappedStage('Test', verbose) {
-                    runStep('test')
-                }
-                wrappedStage('IT', verbose) {
-                    runStep('it')
-                }
-                wrappedStage('Build', verbose) {
+//                script.buildStep('Test', verbose) {
+//                    runStep('test')
+//                }
+//                script.buildStep('IT', verbose) {
+//                    runStep('it')
+//                }
+                script.buildStep('Build', verbose) {
                     runStep('build')
                     def dockerImage = script.docker.build(artifact.name)
                     if (push) {
@@ -91,15 +91,5 @@ class DockerfileBuilder implements ArtifactBuilder {
         }
 
         return imageName
-    }
-
-    def wrappedStage(String name, boolean verbose, Closure body) {
-        if (verbose) {
-            script.stage(name) {
-                body()
-            }
-        } else {
-            body()
-        }
     }
 }

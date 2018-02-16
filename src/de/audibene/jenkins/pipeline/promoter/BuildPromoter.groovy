@@ -15,13 +15,10 @@ class BuildPromoter {
     def promote(Map params) {
         def branch = params.branch ?: requireNonNull('branch')
 
-        script.stage("Promote to ${branch}?") {
-            script.input("Promote to ${branch}?")
-        }
+        script.approveStep("Promote to ${branch}?")
 
-        script.stage("Promote to ${branch}") {
+        script.buildStep("Promote to ${branch}") {
             script.echo "TODO: Promote $branch"
         }
-
     }
 }
