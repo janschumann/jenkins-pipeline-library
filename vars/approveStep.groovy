@@ -11,9 +11,11 @@ def call(String name, Map params = [:]) {
     buildStep(name) {
         def approve = getApprove(time, unit, message, timeoutAs)
 
+        echo "Result is $approve"
+
         if (!approve.result) {
             stageStatus= 'ABORTED'
-            currentBuild.result = 'ABORTED'
+//            currentBuild.result = 'ABORTED'
             throw new ApproveStepRejected("Rejected by ${approve.userName}")
         }
     }
@@ -25,19 +27,16 @@ private def getApprove(time, unit, message, timeoutAs) {
         timeout(time: time, unit: unit) {
             input(message)
         }
-        echo "Approved"
         return [result: true, userName: getApprover()]
     } catch (FlowInterruptedException e) {
-        echo "Exception"
         def rejectedBy = getRejectedBy(e)
-        echo "Rejector $rejectedBy"
         def result = rejectedBy == "SYSTEM" && timeoutAs
         return [result: result, userName: rejectedBy]
     }
 }
 
-
 @NonCPS
+@SuppressWarnings("GrMethodMayBeStatic")
 def getRejectedBy(FlowInterruptedException e) {
     def rejection = e.causes[0]
 
