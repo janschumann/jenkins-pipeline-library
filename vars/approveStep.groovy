@@ -12,7 +12,7 @@ def call(String name, Map params = [:]) {
 
     if (!approve.result) {
         currentStage.result =  'ABORTED'
-        currentBuild.result = 'ABORTED'
+//        currentBuild.result = 'ABORTED'
         throw new ApproveStepRejected("Rejected by ${approve.userName}")
     }
 }
