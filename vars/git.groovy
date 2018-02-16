@@ -35,7 +35,7 @@ class Git {
     def execute(body) {
         initialize()
         script.sshagent([config.credentials]){
-            body
+            body()
         }
     }
 
