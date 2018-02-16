@@ -1,5 +1,7 @@
 package de.audibene.jenkins.pipeline.builder
 
+import static de.audibene.jenkins.pipeline.Objects.requireNonNull
+
 class DockerfileBuilder implements ArtifactBuilder {
 
     private final def script
@@ -9,9 +11,9 @@ class DockerfileBuilder implements ArtifactBuilder {
 
     DockerfileBuilder(script, config) {
         this.script = script
-        this.steps = config.steps
-        this.image = config.image
-        this.artifact = config.artifact
+        this.steps = config.steps ?: requireNonNull('steps') as Map
+        this.image = config.image ?: requireNonNull('image') as Map
+        this.artifact = config.artifact ?: requireNonNull('artifact') as Map
     }
 
     def inside(image = this.image, body) {
@@ -54,12 +56,9 @@ class DockerfileBuilder implements ArtifactBuilder {
 
     @Override
     String build(Map parameters) {
-        boolean verbose = parameters.get('verbose', true)
-        boolean push = parameters.get('push', false)
-        String tag = parameters.get('tag')
-        if (push && tag == null) {
-            throw new IllegalAccessException('There is no required parameter: tag')
-        }
+        def verbose = parameters.verbose ?: true
+        def push = parameters.push ?: false
+        def tag = parameters.tag ?: requireNonNull('tag', push)
 
         def imageName = null
 

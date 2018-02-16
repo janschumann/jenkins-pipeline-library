@@ -1,5 +1,7 @@
 package de.audibene.jenkins.pipeline.deployer
 
+import static de.audibene.jenkins.pipeline.Objects.requireNonNull
+
 class BeansTalkDeployer implements ArtifactDeployer {
 
     private final def script
@@ -12,10 +14,10 @@ class BeansTalkDeployer implements ArtifactDeployer {
 
     @Override
     def deploy(final Map params) {
-        def artifact = params.artifact
-        def environment = params.environment
+        def artifact = params.artifact ?: requireNonNull('artifact')
+        def environment = params.environment ?: requireNonNull('environment')
 
-        script.stage("Approval for ${environment}") {
+        script.stage("Deploy to ${environment}?") {
             script.input("Deploy to ${environment}?")
         }
 
