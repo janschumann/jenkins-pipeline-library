@@ -9,8 +9,8 @@ def call(body) {
     def config = configs(body)
 
     def tag = Long.toString(new Date().time, Character.MAX_RADIX)
-    def builder = requireNonNull(config.builder, 'threeFlowPipeline.builder') as ArtifactBuilder
-    def deployer = requireNonNull(config.deployer, 'threeFlowPipeline.deployer') as ArtifactDeployer
+    def builder = config.builder as ArtifactBuilder
+    def deployer = config.deployer as ArtifactDeployer
     def promoter = new BuildPromoter(this)
 
     if (env.BRANCH_NAME.startsWith('PR-')) {
