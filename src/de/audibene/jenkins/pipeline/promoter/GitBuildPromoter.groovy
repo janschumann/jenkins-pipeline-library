@@ -16,6 +16,7 @@ class GitBuildPromoter {
         script.approveStep("Promote to ${branch}?")
 
         script.buildStep("Promote to ${branch}") {
+            script.checkout script.scm
             git.branch(branch)
         }
     }
