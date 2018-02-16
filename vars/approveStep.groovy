@@ -12,6 +12,8 @@ def call(String name, Map params = [:]) {
     echo "Receive result: $approve"
     if (!approve.result) {
         env.BUILD_FASE = 'STOPPED'
+        currentBuild.result = 'SUCCESS'
+        error("Rejected by ${approve.rejectedBy}")
     }
 }
 
