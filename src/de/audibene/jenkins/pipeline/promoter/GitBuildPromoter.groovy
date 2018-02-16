@@ -1,13 +1,13 @@
 package de.audibene.jenkins.pipeline.promoter
 
-class BuildPromoter {
+class GitBuildPromoter {
 
     private final def script
-    private final Map params
+    private final def git
 
-    BuildPromoter(script, params = [:]) {
+    GitBuildPromoter(script, params = [:]) {
         this.script = script
-        this.params = params
+        this.git = params.git
     }
 
     def promote(Map params) {
@@ -16,7 +16,7 @@ class BuildPromoter {
         script.approveStep("Promote to ${branch}?")
 
         script.buildStep("Promote to ${branch}") {
-            script.echo "TODO: Promote $branch"
+            git.branch(branch)
         }
     }
 }

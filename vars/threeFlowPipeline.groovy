@@ -3,7 +3,7 @@
 import de.audibene.jenkins.pipeline.builder.ArtifactBuilder
 import de.audibene.jenkins.pipeline.deployer.ArtifactDeployer
 import de.audibene.jenkins.pipeline.exception.ApproveStepRejected
-import de.audibene.jenkins.pipeline.promoter.BuildPromoter
+import de.audibene.jenkins.pipeline.promoter.GitBuildPromoter
 
 
 def call(body) {
@@ -13,7 +13,7 @@ def call(body) {
     def builder = config.builder as ArtifactBuilder
     def deployer = config.deployer as ArtifactDeployer
     def git = config.git
-    def promoter = new BuildPromoter(this)
+    def promoter = new GitBuildPromoter(this, [git: git])
 
     try {
         if (env.BRANCH_NAME.startsWith('PR-')) {

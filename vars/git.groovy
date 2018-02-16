@@ -24,4 +24,10 @@ class Git {
         script.sh "git tag -a $tag -m 'create tag: $tag'"
         script.sh "git push $upstream --tags"
     }
+
+    def branch(branch) {
+        initialize()
+        script.sh "git push $upstream HEAD:$branch"
+    }
+
 }
