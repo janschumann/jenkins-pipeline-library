@@ -67,12 +67,12 @@ class DockerfileBuilder implements ArtifactBuilder {
                     script.checkout script.scm
                     runStep('prepare')
                 }
-//                script.buildStep('Test', verbose) {
-//                    runStep('test')
-//                }
-//                script.buildStep('IT', verbose) {
-//                    runStep('it')
-//                }
+                script.buildStep('Test', verbose) {
+                    runStep('test')
+                }
+                script.buildStep('IT', verbose) {
+                    runStep('it')
+                }
                 script.buildStep('Build', verbose) {
                     runStep('build')
                     def dockerImage = script.docker.build(artifact.name)
