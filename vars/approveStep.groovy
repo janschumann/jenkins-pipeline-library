@@ -9,9 +9,7 @@ def call(String name, Map params = [:]) {
 
     def approve = getApprove(name, time, unit, message, timeoutAs)
 
-    echo "Receive result: $approve"
     if (!approve.result) {
-        env.BUILD_FASE = 'STOPPED'
         currentBuild.result = 'ABORTED'
         error("Rejected by ${approve.userName}")
     }
