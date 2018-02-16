@@ -8,30 +8,31 @@ def call(String name, Map params = [:]) {
     def message = params.message ?: name
     def timeoutAs = params.get('timeoutAs', false)
 
-    def approve = getApprove(name, time, unit, message, timeoutAs)
+    buildStep(name) {
+        def approve = getApprove(time, unit, message, timeoutAs)
 
-    if (!approve.result) {
-        currentStage.result = 'NOT_BUILT'
-        currentBuild.result = 'ABORTED'
-        throw new ApproveStepRejected("Rejected by ${approve.userName}")
+        if (!approve.result) {
+            currentStage.result = 'NOT_BUILT'
+            currentBuild.result = 'ABORTED'
+            throw new ApproveStepRejected("Rejected by ${approve.userName}")
+        }
     }
+
 }
 
-private def getApprove(String name, time, unit, message, timeoutAs) {
-    buildStep(name) {
-        try {
-            timeout(time: time, unit: unit) {
-                input(message)
-            }
-            echo "Approved"
-            return [result: true, userName: getApprover()]
-        } catch (FlowInterruptedException e) {
-            echo "Exception"
-            def rejectedBy = getRejectedBy(e)
-            echo "Rejector $rejectedBy"
-            def result = rejectedBy == "SYSTEM" && timeoutAs
-            return [result: result, userName: rejectedBy]
+private def getApprove(time, unit, message, timeoutAs) {
+    try {
+        timeout(time: time, unit: unit) {
+            input(message)
         }
+        echo "Approved"
+        return [result: true, userName: getApprover()]
+    } catch (FlowInterruptedException e) {
+        echo "Exception"
+        def rejectedBy = getRejectedBy(e)
+        echo "Rejector $rejectedBy"
+        def result = rejectedBy == "SYSTEM" && timeoutAs
+        return [result: result, userName: rejectedBy]
     }
 }
 
