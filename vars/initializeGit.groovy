@@ -1,7 +1,5 @@
 def call(body) {
-    this.git = new Git(this, configs(body))
-    git.initialize()
-    return git
+    return new Git(this, configs(body))
 }
 
 class Git {
@@ -22,6 +20,7 @@ class Git {
     }
 
     def tag(tag) {
+        initialize()
         script.sh "git tag -a $tag -m 'create tag: $tag'"
         script.sh "git push $upstream --tags"
     }
