@@ -20,14 +20,23 @@ class Git {
     }
 
     def tag(tag) {
-        initialize()
-        script.sh "git tag -a $tag -m 'create tag: $tag'"
-        script.sh "git push $upstream --tags"
+        execute {
+            script.sh "git tag -a $tag -m 'create tag: $tag'"
+            script.sh "git push $upstream --tags"
+        }
     }
 
     def branch(branch) {
+        execute {
+            script.sh "git push $upstream HEAD:$branch"
+        }
+    }
+
+    def execute(body) {
         initialize()
-        script.sh "git push $upstream HEAD:$branch"
+        sshagent([config.credentials]){
+            body
+        }
     }
 
 }
