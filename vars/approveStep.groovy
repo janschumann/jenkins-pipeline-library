@@ -27,7 +27,7 @@ private def getApprove(String name, time, unit, message, timeoutAs) {
             echo "Exception"
             def rejectedBy = getRejectedBy(e)
             echo "Rejector $rejectedBy"
-            def result = rejectedBy != "SYSTEM" || timeoutAs
+            def result = rejectedBy == "SYSTEM" && timeoutAs
             return [result: result, userName: rejectedBy]
         }
     }
