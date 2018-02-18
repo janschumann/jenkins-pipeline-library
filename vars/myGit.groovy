@@ -1,5 +1,5 @@
 def call(body) {
-    return new Git(this, configs(body))
+    return new Git(this,  configure(body))
 }
 
 class Git {

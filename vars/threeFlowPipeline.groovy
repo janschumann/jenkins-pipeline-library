@@ -7,7 +7,7 @@ import de.audibene.jenkins.pipeline.promoter.GitBuildPromoter
 
 
 def call(body) {
-    def config = configs(body)
+    def config =  configure(body)
 
     def tag = Long.toString(new Date().time, Character.MAX_RADIX)
     def builder = config.builder as ArtifactBuilder

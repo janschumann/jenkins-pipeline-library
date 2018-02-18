@@ -1,7 +1,6 @@
 #!groovy
 
-def call(Closure body) {
-    def config = [:]
+def call(config = [:], Closure body) {
     body.resolveStrategy = Closure.DELEGATE_FIRST
     body.delegate = config
     body()
