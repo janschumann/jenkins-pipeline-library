@@ -40,19 +40,19 @@ class DockerImage {
         }
     }
 
-    def withRun(Closure body) {
+    def around(Closure body) {
         def image = this
         if (config.beforeRun) {
             config.beforeRun()
         }
-        docker.image(config.id).withRun(config.args) { c ->
-            def container = [image: image, id: c.id]
-            if (config.beforeWithRun) {
-                config.beforeWithRun(container)
+        docker.image(config.id).withRun(config.args) {
+            def container = [image: image, id: it.id]
+            if (config.beforeAround) {
+                config.beforeAround(container)
             }
             body(container)
-            if (config.afterWithRun) {
-                config.afterWithRun(container)
+            if (config.afterAround) {
+                config.afterAround(container)
             }
         }
         if (config.afterRun) {
