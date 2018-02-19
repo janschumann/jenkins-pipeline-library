@@ -21,17 +21,17 @@ def call(body) {
             builder.build(verbose: true)
         } else if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME.startsWith('test-')) {
             echo 'Snapshot Flow'
-            def artifact = builder.build(push: true, tag: "snapshot-$tag", Aroundscm: scm, auto: true)
+            def artifact = builder.build(push: true, tag: "snapshot-$tag", scm: scm, auto: true)
             deployer.deploy(artifact: artifact, environment: 'develop')
             promoter.promote(branch: 'candidate')
         } else if (env.BRANCH_NAME == 'candidate') {
             echo 'Candidate Flow'
-            def artifact = builder.build(push: true, tag: "candidate-$tag", Aroundscm: scm)
+            def artifact = builder.build(push: true, tag: "candidate-$tag", scm: scm)
             deployer.deploy(artifact: artifact, environment: 'staging')
             promoter.promote(branch: 'release')
         } else if (env.BRANCH_NAME == 'release') {
             echo 'Release Flow'
-            def artifact = builder.build(push: true, tag: "release-$tag", Aroundscm: scm)
+            def artifact = builder.build(push: true, tag: "release-$tag", scm: scm)
             deployer.deploy(artifact: artifact, environment: 'production')
         }
     } catch (ApproveStepRejected ignore) {
