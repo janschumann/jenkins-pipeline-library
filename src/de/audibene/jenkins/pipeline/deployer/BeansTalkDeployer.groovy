@@ -15,30 +15,21 @@ class BeansTalkDeployer implements ArtifactDeployer {
         def artifact = params.artifact
         def environment = params.environment
         def auto = params.get('auto', false)
+        def application = config.application
+        def tag = params.tag
 
         if (!auto) {
             script.approveStep("Deploy to ${environment}?")
         }
 
         script.buildNode('ecs') {
-            script.sh 'ls -lah'
+            script.deleteDir()
             script.buildStep("Deploy to ${environment}") {
-                script.sh 'mkdir -p .elasticbeanstalk/'
-                script.writeFile file: '.elasticbeanstalk/config.yml', text: """
-                |global:
-                |  application_name: ${config.application}
-                |  default_platform: ${config.platform}
-                |  default_region: ${config.region}
-                """.stripMargin()
-
-                script.sh 'cat .elasticbeanstalk/config.yml'
-                
-                
                 script.writeFile file: 'Dockerrun.aws.json', text: """
                 |{
                 |  "AWSEBDockerrunVersion": "1",
                 |  "Image": {
-                |    "Name": "$artifact,
+                |    "Name": "$artifact",
                 |    "Update":true
                 |  },
                 |  "Ports": [
@@ -48,9 +39,25 @@ class BeansTalkDeployer implements ArtifactDeployer {
                 |  ]
                 |}""".stripMargin()
 
-                script.sh 'cat Dockerrun.aws.json'
 
-                script.echo "TODO: deploy $artifact to $environment"
+                script.step([
+                        $class:'AWSEBDeploymentBuilder',
+                        credentialId: '',
+                        awsRegion: config.region,
+                        applicationName: application,
+                        environmentName: environment,
+                        bucketName: '',
+                        keyPrefix: application,
+                        versionLabelFormat: "$application:$tag",
+                        versionDescriptionFormat: '',
+                        rootObject: '',
+                        includes: '',
+                        excludes: '',
+                        zeroDowntime: false,
+                        checkHealth: true,
+                        sleepTime: 10,
+                        maxAttempts: 60
+                ])
             }
         }
     }

@@ -15,7 +15,7 @@ def call(body) {
 def pipeline(body) {
     def config = configure(body)
 
-    def tag = Long.toString(new Date().time, Character.MAX_RADIX)
+    def build = Long.toString(new Date().time, Character.MAX_RADIX)
     def builder = config.builder as ArtifactBuilder
     def deployer = config.deployer as ArtifactDeployer
     def scm = config.scm
@@ -27,18 +27,21 @@ def pipeline(body) {
             builder.build(verbose: true, scm: scm)
         } else if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME.startsWith('test-')) {
             echo 'Snapshot Flow'
-//            def artifact = builder.build(push: true, tag: "snapshot-$tag", scm: scm)
-            deployer.deploy(artifact: '193753186585.dkr.ecr.eu-central-1.amazonaws.com/audibene-microservice:latest', environment: 'develop', auto: true)
+            def tag = "snapshot-$tag"
+            def artifact = builder.build(push: true, tag: tag, scm: scm)
+            deployer.deploy(artifact: artifact, environment: 'develop', tag: tag, auto: true)
             promoter.promote(branch: 'candidate')
         } else if (env.BRANCH_NAME == 'candidate') {
             echo 'Candidate Flow'
-            def artifact = builder.build(push: true, tag: "candidate-$tag", scm: scm)
-            deployer.deploy(artifact: artifact, environment: 'staging')
+            def tag = "candidate-$tag"
+            def artifact = builder.build(push: true, tag: tag, scm: scm)
+            deployer.deploy(artifact: artifact, environment: 'staging', tag: tag)
             promoter.promote(branch: 'release')
         } else if (env.BRANCH_NAME == 'release') {
             echo 'Release Flow'
-            def artifact = builder.build(push: true, tag: "release-$tag", scm: scm)
-            deployer.deploy(artifact: artifact, environment: 'production')
+            def tag = "release-$build"
+            def artifact = builder.build(push: true, tag: tag, scm: scm)
+            deployer.deploy(artifact: artifact, environment: 'production', tag: tag)
         }
     } catch (ApproveStepRejected ignore) {
         currentBuild.result = 'SUCCESS'
