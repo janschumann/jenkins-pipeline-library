@@ -39,10 +39,10 @@ class DockerfileBuilder implements ArtifactBuilder {
                     runStep('prepare')
                 }
                 script.buildStep('Test', verbose) {
-                    runStep('test')
+                    runStep('unitTest')
                 }
                 script.buildStep('IT', verbose) {
-                    runStep('it')
+                    runStep('itTest')
                 }
                 script.buildStep('Build', verbose) {
                     runStep('build')
