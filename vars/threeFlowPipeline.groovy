@@ -18,7 +18,7 @@ def call(body) {
     try {
         if (env.BRANCH_NAME.startsWith('PR-')) {
             echo 'PR Flow'
-            builder.build(verbose: true)
+            builder.build(verbose: true, scm: scm)
         } else if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME.startsWith('test-')) {
             echo 'Snapshot Flow'
             def artifact = builder.build(push: true, tag: "snapshot-$tag", scm: scm)
