@@ -1,14 +1,10 @@
-#!groovy
+package de.audibene.jenkins.pipeline.scm
 
-def call(Closure body) {
-    return new Delegate(this, configure(body))
-}
-
-class Delegate {
+class Git {
     private final def script
     private final Map config
 
-    Delegate(script, config) {
+    Git(script, config) {
         this.script = script
         this.config = config
         this.script.git = this

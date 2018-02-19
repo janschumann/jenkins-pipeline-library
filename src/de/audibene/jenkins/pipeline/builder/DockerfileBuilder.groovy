@@ -63,7 +63,7 @@ class DockerfileBuilder implements ArtifactBuilder {
 
     private void loginEcrRepository() {
         def ecrLogin = script.ecrLogin()
-        wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [[password: ecrLogin, var: 'ECR_LOGIN']]]) {
+        script.wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [[password: ecrLogin, var: 'ECR_LOGIN']]]) {
             script.sh ecrLogin
         }
     }
