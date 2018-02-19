@@ -27,13 +27,13 @@ def pipeline(body) {
             builder.build(verbose: true, scm: scm)
         } else if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME.startsWith('test-')) {
             echo 'Snapshot Flow'
-            def tag = "snapshot-$tag"
+            def tag = "snapshot-$builder"
             def artifact = builder.build(push: true, tag: tag, scm: scm)
             deployer.deploy(artifact: artifact, environment: 'develop', tag: tag, auto: true)
             promoter.promote(branch: 'candidate')
         } else if (env.BRANCH_NAME == 'candidate') {
             echo 'Candidate Flow'
-            def tag = "candidate-$tag"
+            def tag = "candidate-$builder"
             def artifact = builder.build(push: true, tag: tag, scm: scm)
             deployer.deploy(artifact: artifact, environment: 'staging', tag: tag)
             promoter.promote(branch: 'release')
