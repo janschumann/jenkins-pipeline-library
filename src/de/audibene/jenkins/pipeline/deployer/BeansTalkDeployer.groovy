@@ -31,7 +31,7 @@ class BeansTalkDeployer implements ArtifactDeployer {
                 |   default_region: ${config.region}
                 """.stripMargin()
 
-                script 'cat deploy/.elasticbeanstalk/config.yml'
+                script.sh 'cat deploy/.elasticbeanstalk/config.yml'
 
                 script.echo "TODO: deploy $artifact to $environment"
             }
