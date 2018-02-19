@@ -8,7 +8,7 @@ import de.audibene.jenkins.pipeline.promoter.GitBuildPromoter
 
 def call(body) {
     timestamps {
-//        pipeline(body)
+        pipeline(body)
     }
 }
 
