@@ -27,8 +27,8 @@ def pipeline(body) {
             builder.build(verbose: true, scm: scm)
         } else if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME.startsWith('test-')) {
             echo 'Snapshot Flow'
-            def artifact = builder.build(push: true, tag: "snapshot-$tag", scm: scm)
-            deployer.deploy(artifact: artifact, environment: 'develop', auto: true)
+//            def artifact = builder.build(push: true, tag: "snapshot-$tag", scm: scm)
+            deployer.deploy(artifact: '193753186585.dkr.ecr.eu-central-1.amazonaws.com/audibene-microservice:latest', environment: 'develop', auto: true)
             promoter.promote(branch: 'candidate')
         } else if (env.BRANCH_NAME == 'candidate') {
             echo 'Candidate Flow'

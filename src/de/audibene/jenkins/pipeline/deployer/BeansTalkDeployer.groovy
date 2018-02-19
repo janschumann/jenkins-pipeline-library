@@ -23,7 +23,7 @@ class BeansTalkDeployer implements ArtifactDeployer {
         script.buildNode('ecs') {
             script.sh 'ls -lah'
             script.buildStep("Deploy to ${environment}") {
-                script.sh 'modir -p .elasticbeanstalk/'
+                script.sh 'mkdir -p .elasticbeanstalk/'
                 script.writeFile file: '.elasticbeanstalk/config.yml', text: """
                 |global:
                 |   application_name: ${config.application}
