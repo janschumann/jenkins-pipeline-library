@@ -1,4 +1,5 @@
 #!groovy
+
 import de.audibene.jenkins.pipeline.exception.ApproveStepRejected
 import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 

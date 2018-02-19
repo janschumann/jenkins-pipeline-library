@@ -1,14 +1,14 @@
 #!groovy
 
-def static git(body) {
-    return new Git(this,  configure(body))
+def call(Closure body) {
+    return new Delegate(this, configure(body))
 }
 
-class Git {
+class Delegate {
     private final def script
     private final Map config
 
-    Git(script, config) {
+    Delegate(script, config) {
         this.script = script
         this.config = config
         this.script.git = this
