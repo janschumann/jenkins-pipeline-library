@@ -1,4 +1,4 @@
-def call(body) {
+def git(body) {
     return new Git(this,  configure(body))
 }
 
@@ -10,6 +10,12 @@ class Git {
         this.script = script
         this.config = config
         this.script.git = this
+    }
+
+    def checkout() {
+        script.buildNode {
+            script.checkout script.scm
+        }
     }
 
     def tag(tag) {

@@ -57,7 +57,7 @@ class DockerfileBuilder implements ArtifactBuilder {
         boolean verbose = parameters.get('verbose', true)
         boolean push = parameters.get('push', false)
         String tag = parameters.tag
-        def git = parameters.git
+        def scm = parameters.scm
 
         def imageName = null
 
@@ -81,7 +81,7 @@ class DockerfileBuilder implements ArtifactBuilder {
                         script.docker.withRegistry(artifact.registry) {
                             script.sh script.ecrLogin()
                             dockerImage.push(tag)
-                            git.tag(tag)
+                            scm.tag(tag)
                             imageName = "${dockerImage.imageName()}:$tag"
                         }
 

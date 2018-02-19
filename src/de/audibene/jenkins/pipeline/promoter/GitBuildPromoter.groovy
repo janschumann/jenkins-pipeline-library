@@ -3,11 +3,11 @@ package de.audibene.jenkins.pipeline.promoter
 class GitBuildPromoter {
 
     private final def script
-    private final def git
+    private final def scm
 
     GitBuildPromoter(script, params = [:]) {
         this.script = script
-        this.git = params.git
+        this.scm = params.git
     }
 
     def promote(Map params) {
@@ -17,8 +17,8 @@ class GitBuildPromoter {
 
         script.buildStep("Promote to ${branch}") {
             script.buildNode {
-                script.checkout script.scm
-                git.branch(branch)
+                scm.checkout()
+                scm.branch(branch)
             }
         }
     }
