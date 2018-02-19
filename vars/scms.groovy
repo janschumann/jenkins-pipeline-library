@@ -1,4 +1,6 @@
-def git(body) {
+#!groovy
+
+def static git(body) {
     return new Git(this,  configure(body))
 }
 
