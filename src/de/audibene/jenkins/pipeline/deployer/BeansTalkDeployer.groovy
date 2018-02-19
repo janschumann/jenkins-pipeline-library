@@ -26,12 +26,29 @@ class BeansTalkDeployer implements ArtifactDeployer {
                 script.sh 'mkdir -p .elasticbeanstalk/'
                 script.writeFile file: '.elasticbeanstalk/config.yml', text: """
                 |global:
-                |   application_name: ${config.application}
-                |   default_platform: ${config.platform}
-                |   default_region: ${config.region}
+                |  application_name: ${config.application}
+                |  default_platform: ${config.platform}
+                |  default_region: ${config.region}
                 """.stripMargin()
 
                 script.sh 'cat deploy/.elasticbeanstalk/config.yml'
+                
+                
+                script.writeFile file: 'Dockerrun.aws.json', text: """
+                |{
+                |  "AWSEBDockerrunVersion": "1",
+                |  "Image": {
+                |    "Name": "$artifact,
+                |    "Update":true
+                |  },
+                |  "Ports": [
+                |    {
+                |      "ContainerPort": "${config.port}"
+                |    }
+                |  ]
+                |}""".stripMargin()
+
+                script.sh 'cat Dockerrun.aws.json'
 
                 script.echo "TODO: deploy $artifact to $environment"
             }
