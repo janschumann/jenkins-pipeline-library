@@ -53,7 +53,7 @@ class BeansTalkDeployer implements ArtifactDeployer {
                         environmentName         : environment,
                         bucketName              : '',
                         keyPrefix               : application,
-                        versionLabelFormat      : "$application:$tag",
+                        versionLabelFormat      : tag,
                         versionDescriptionFormat: '',
                         rootObject              : '',
                         includes                : '',
