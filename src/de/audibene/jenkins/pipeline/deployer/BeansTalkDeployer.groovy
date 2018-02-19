@@ -3,11 +3,11 @@ package de.audibene.jenkins.pipeline.deployer
 class BeansTalkDeployer implements ArtifactDeployer {
 
     private final def script
-    private final Map params
+    private final Map config
 
-    BeansTalkDeployer(def script, params) {
+    BeansTalkDeployer(def script, config) {
         this.script = script
-        this.params = params
+        this.config = config
     }
 
     @Override
@@ -21,6 +21,16 @@ class BeansTalkDeployer implements ArtifactDeployer {
         }
 
         script.buildStep("Deploy to ${environment}") {
+            script.sh 'modir -p deploy/.elasticbeanstalk/'
+            script.writeFile file: 'deploy/.elasticbeanstalk/config.yml', text: """
+                |global:
+                |   application_name: ${config.application}
+                |   default_platform: ${config.platform}
+                |   default_region: ${config.region}
+            """.stripMargin()
+
+            script 'cat deploy/.elasticbeanstalk/config.yml'
+
             script.echo "TODO: deploy $artifact to $environment"
         }
     }
