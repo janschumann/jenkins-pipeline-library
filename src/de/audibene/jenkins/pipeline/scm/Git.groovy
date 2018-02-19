@@ -1,6 +1,6 @@
 package de.audibene.jenkins.pipeline.scm
 
-class Git {
+class Git implements Scm{
     private final def script
     private final Map config
 
@@ -10,18 +10,21 @@ class Git {
         this.script.git = this
     }
 
+    @Override
     def checkout() {
         script.buildNode {
             script.checkout script.scm
         }
     }
 
-    def tag(tag) {
+    @Override
+    def tag(String tag) {
         execute "git tag -a $tag -m 'create tag: $tag'"
         execute "git push origin --tags"
     }
 
-    def branch(branch) {
+    @Override
+    def branch(String branch) {
         execute "git push origin HEAD:$branch"
     }
 

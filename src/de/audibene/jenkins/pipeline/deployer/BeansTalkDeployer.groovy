@@ -14,8 +14,11 @@ class BeansTalkDeployer implements ArtifactDeployer {
     def deploy(final Map params) {
         def artifact = params.artifact
         def environment = params.environment
+        def auto = params.get('auto', false)
 
-        script.approveStep("Deploy to ${environment}?")
+        if (!auto) {
+            script.approveStep("Deploy to ${environment}?")
+        }
 
         script.buildStep("Deploy to ${environment}") {
             script.echo "TODO: deploy $artifact to $environment"

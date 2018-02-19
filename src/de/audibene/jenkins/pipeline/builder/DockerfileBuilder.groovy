@@ -1,5 +1,7 @@
 package de.audibene.jenkins.pipeline.builder
 
+import de.audibene.jenkins.pipeline.scm.Scm
+
 class DockerfileBuilder implements ArtifactBuilder {
 
     private final def script
@@ -23,10 +25,10 @@ class DockerfileBuilder implements ArtifactBuilder {
 
     @Override
     String build(Map parameters = [:]) {
-        boolean verbose = parameters.get('verbose', true)
+        boolean verbose = parameters.get('verbose', false)
         boolean push = parameters.get('push', false)
         String tag = parameters.tag
-        def scm = parameters.scm
+        Scm scm = parameters.scm
 
         def imageName = null
 
