@@ -7,7 +7,13 @@ import de.audibene.jenkins.pipeline.promoter.GitBuildPromoter
 
 
 def call(body) {
-    def config =  configure(body)
+    timestamps {
+        pipeline(body)
+    }
+}
+
+def pipeline(body) {
+    def config = configure(body)
 
     def tag = Long.toString(new Date().time, Character.MAX_RADIX)
     def builder = config.builder as ArtifactBuilder
@@ -37,4 +43,5 @@ def call(body) {
     } catch (ApproveStepRejected ignore) {
         currentBuild.result = 'SUCCESS'
     }
+
 }

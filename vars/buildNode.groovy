@@ -5,7 +5,9 @@ def <V> V call(name = null, Closure<V> body) {
         body()
     } else {
         node(name) {
-            body()
+            wrap([$class: 'AnsiColorBuildWrapper']) {
+                body()
+            }
         }
     }
 }
