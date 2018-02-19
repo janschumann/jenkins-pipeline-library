@@ -24,11 +24,12 @@ class DockerfileBuilder implements ArtifactBuilder {
     }
 
     @Override
-    String build(Map parameters = [:]) {
-        boolean verbose = parameters.get('verbose', false)
-        boolean push = parameters.get('push', false)
-        String tag = parameters.tag
-        Scm scm = parameters.scm
+    String build(Map params = [:]) {
+        echo "Build with $params"
+        boolean verbose = params.get('verbose', false)
+        boolean push = params.get('push', false)
+        String tag = params.tag
+        Scm scm = params.scm
 
         def imageName = null
 
