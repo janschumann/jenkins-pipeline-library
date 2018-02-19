@@ -12,8 +12,6 @@ class BeansTalkDeployer implements ArtifactDeployer {
 
     @Override
     def deploy(final Map params) {
-        script.echo "Deploy with $params"
-
         def artifact = params.artifact
         def environment = params.environment
         def auto = params.get('auto', false)

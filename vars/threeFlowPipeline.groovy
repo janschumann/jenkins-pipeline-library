@@ -21,8 +21,8 @@ def call(body) {
             builder.build(verbose: true)
         } else if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME.startsWith('test-')) {
             echo 'Snapshot Flow'
-            def artifact = builder.build(push: true, tag: "snapshot-$tag", scm: scm, auto: true)
-            deployer.deploy(artifact: artifact, environment: 'develop')
+            def artifact = builder.build(push: true, tag: "snapshot-$tag", scm: scm)
+            deployer.deploy(artifact: artifact, environment: 'develop', auto: true)
             promoter.promote(branch: 'candidate')
         } else if (env.BRANCH_NAME == 'candidate') {
             echo 'Candidate Flow'
