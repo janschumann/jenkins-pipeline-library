@@ -54,7 +54,7 @@ class BeansTalkDeployer implements ArtifactDeployer {
                         bucketName              : '',
                         keyPrefix               : application,
                         versionLabelFormat      : tag,
-                        versionDescriptionFormat: '',
+                        versionDescriptionFormat: artifact,
                         rootObject              : '',
                         includes                : '',
                         excludes                : '',
