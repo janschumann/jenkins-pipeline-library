@@ -20,18 +20,21 @@ class BeansTalkDeployer implements ArtifactDeployer {
             script.approveStep("Deploy to ${environment}?")
         }
 
-        script.buildStep("Deploy to ${environment}") {
-            script.sh 'modir -p deploy/.elasticbeanstalk/'
-            script.writeFile file: 'deploy/.elasticbeanstalk/config.yml', text: """
+        script.buildNode('ecs') {
+            script.sh 'ls -lah'
+            script.buildStep("Deploy to ${environment}") {
+                script.sh 'modir -p .elasticbeanstalk/'
+                script.writeFile file: '.elasticbeanstalk/config.yml', text: """
                 |global:
                 |   application_name: ${config.application}
                 |   default_platform: ${config.platform}
                 |   default_region: ${config.region}
-            """.stripMargin()
+                """.stripMargin()
 
-            script 'cat deploy/.elasticbeanstalk/config.yml'
+                script 'cat deploy/.elasticbeanstalk/config.yml'
 
-            script.echo "TODO: deploy $artifact to $environment"
+                script.echo "TODO: deploy $artifact to $environment"
+            }
         }
     }
 }
