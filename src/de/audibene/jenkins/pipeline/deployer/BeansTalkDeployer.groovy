@@ -16,15 +16,18 @@ class BeansTalkDeployer implements ArtifactDeployer {
         def environment = params.environment
         def auto = params.get('auto', false)
         def application = config.application
+        def region = config.region
+        def port = config.port
         def tag = params.tag
 
         if (!auto) {
             script.approveStep("Deploy to ${environment}?")
         }
 
-        script.buildNode('ecs') {
+        script.buildNode {
             script.deleteDir()
             script.buildStep("Deploy to ${environment}") {
+
                 script.writeFile file: 'Dockerrun.aws.json', text: """
                 |{
                 |  "AWSEBDockerrunVersion": "1",
@@ -34,30 +37,33 @@ class BeansTalkDeployer implements ArtifactDeployer {
                 |  },
                 |  "Ports": [
                 |    {
-                |      "ContainerPort": "${config.port}"
+                |      "ContainerPort": "${port}"
                 |    }
                 |  ]
                 |}""".stripMargin()
 
 
-                script.step([
-                        $class:'AWSEBDeploymentBuilder',
-                        credentialId: '',
-                        awsRegion: config.region,
-                        applicationName: application,
-                        environmentName: environment,
-                        bucketName: '',
-                        keyPrefix: application,
-                        versionLabelFormat: "$application:$tag",
+                def stepParams = [
+                        $class                  : 'AWSEBDeploymentBuilder',
+                        credentialId            : '',
+                        awsRegion               : region,
+                        applicationName         : application,
+                        environmentName         : environment,
+                        bucketName              : '',
+                        keyPrefix               : application,
+                        versionLabelFormat      : "$application:$tag",
                         versionDescriptionFormat: '',
-                        rootObject: '',
-                        includes: '',
-                        excludes: '',
-                        zeroDowntime: false,
-                        checkHealth: true,
-                        sleepTime: 10,
-                        maxAttempts: 60
-                ])
+                        rootObject              : '',
+                        includes                : '',
+                        excludes                : '',
+                        zeroDowntime            : false,
+                        checkHealth             : true,
+                        sleepTime               : 10,
+                        maxAttempts             : 60
+                ]
+
+                script.echo "Do deploy $stepParams"
+                script.step(stepParams)
             }
         }
     }
