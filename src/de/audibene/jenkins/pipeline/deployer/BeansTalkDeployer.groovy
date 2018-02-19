@@ -31,7 +31,7 @@ class BeansTalkDeployer implements ArtifactDeployer {
                 |  default_region: ${config.region}
                 """.stripMargin()
 
-                script.sh 'cat deploy/.elasticbeanstalk/config.yml'
+                script.sh 'cat .elasticbeanstalk/config.yml'
                 
                 
                 script.writeFile file: 'Dockerrun.aws.json', text: """
