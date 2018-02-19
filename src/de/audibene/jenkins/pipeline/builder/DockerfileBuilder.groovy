@@ -4,14 +4,12 @@ class DockerfileBuilder implements ArtifactBuilder {
 
     private final def script
     private final Map<String, Closure> steps
-    private final Map<String, Object> image
     private final Map<String, Object> artifact
 
-    DockerfileBuilder(script, config) {
+    DockerfileBuilder(script, steps = [:], artifact = [:]) {
         this.script = script
-        this.steps = config.steps
-        this.image = config.image
-        this.artifact = config.artifact
+        this.steps = steps
+        this.artifact = artifact
     }
 
     private def runStep(String name) {
@@ -65,5 +63,13 @@ class DockerfileBuilder implements ArtifactBuilder {
 
     private void loginEcrRepository() {
         script.sh script.ecrLogin() //TODO hide credentials
+    }
+
+    def artifact(Closure body) {
+        script.configure(artifact, body)
+    }
+
+    def steps(Closure boyd) {
+        script.configure(steps, body)
     }
 }
