@@ -59,7 +59,7 @@ class DockerfileBuilder implements ArtifactBuilder {
                     }
                 }
             } finally {
-                script.sh 'docker container prune -f -a'
+                script.sh 'docker container prune -f'
                 script.sh 'docker volume prune -f'
             }
         }
