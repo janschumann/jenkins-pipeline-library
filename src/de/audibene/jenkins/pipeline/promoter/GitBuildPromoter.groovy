@@ -7,7 +7,7 @@ class GitBuildPromoter {
 
     GitBuildPromoter(script, params = [:]) {
         this.script = script
-        this.scm = params.git
+        this.scm = params.scm
     }
 
     def promote(Map params) {
