@@ -33,34 +33,29 @@ class DockerfileBuilder implements ArtifactBuilder {
         def imageName = null
 
         script.buildNode('ecs') {
-            try {
-                script.buildStep('Build', !verbose) {
-                    script.buildStep('Prepare', verbose) {
-                        scm.checkout()
-                        runStep('prepare')
-                    }
-                    script.buildStep('Test', verbose) {
-                        runStep('test')
-                    }
-                    script.buildStep('IT', verbose) {
-                        runStep('it')
-                    }
-                    script.buildStep('Build', verbose) {
-                        runStep('build')
-                        def dockerImage = script.docker.build(artifact.name)
-                        if (push) {
-                            script.docker.withRegistry(artifact.registry) {
-                                loginEcrRepository()
-                                dockerImage.push(tag)
-                                scm.tag(tag)
-                                imageName = "${dockerImage.imageName()}:$tag"
-                            }
+            script.buildStep('Build', !verbose) {
+                script.buildStep('Prepare', verbose) {
+                    scm.checkout()
+                    runStep('prepare')
+                }
+                script.buildStep('Test', verbose) {
+                    runStep('test')
+                }
+                script.buildStep('IT', verbose) {
+                    runStep('it')
+                }
+                script.buildStep('Build', verbose) {
+                    runStep('build')
+                    def dockerImage = script.docker.build(artifact.name)
+                    if (push) {
+                        script.docker.withRegistry(artifact.registry) {
+                            loginEcrRepository()
+                            dockerImage.push(tag)
+                            scm.tag(tag)
+                            imageName = "${dockerImage.imageName()}:$tag"
                         }
                     }
                 }
-            } finally {
-                script.sh 'docker container prune -f'
-                script.sh 'docker volume prune -f'
             }
         }
 
