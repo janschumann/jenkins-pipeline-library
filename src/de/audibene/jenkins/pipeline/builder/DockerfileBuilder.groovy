@@ -69,7 +69,7 @@ class DockerfileBuilder implements ArtifactBuilder {
         script.configure(artifact, body)
     }
 
-    def steps(Closure boyd) {
+    def steps(Closure body) {
         script.configure(steps, body)
     }
 }
