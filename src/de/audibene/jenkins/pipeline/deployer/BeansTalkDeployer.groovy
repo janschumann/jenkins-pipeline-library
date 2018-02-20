@@ -14,13 +14,13 @@ class BeansTalkDeployer implements ArtifactDeployer {
     def deploy(final Map params) {
         script.echo "beanstalk config $config"
         script.echo "beanstalk params $params"
-        def artifact = params.artifact
-        def environment = params.environment
-        def auto = params.get('auto', false)
-        def application = config.application
-        def region = config.region
-        def port = config.port
-        def tag = params.tag
+        String artifact = params.artifact
+        String environment = params.environment
+        boolean auto = params.get('auto', false)
+        String application = config.application
+        String region = config.region
+        Integer port = config.port
+        String simpleArtifact = artifact.split('/').last()
 
         if (!auto) {
             script.approveStep("Deploy to ${environment}?")
@@ -51,9 +51,9 @@ class BeansTalkDeployer implements ArtifactDeployer {
                         awsRegion               : region,
                         applicationName         : application,
                         environmentName         : environment,
-                        bucketName              : '',
-                        keyPrefix               : application,
-                        versionLabelFormat      : tag,
+                        bucketName              : application,
+                        keyPrefix               : '',
+                        versionLabelFormat      : simpleArtifact,
                         versionDescriptionFormat: artifact,
                         rootObject              : '',
                         includes                : '',

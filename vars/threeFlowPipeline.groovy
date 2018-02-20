@@ -29,19 +29,19 @@ def pipeline(body) {
             echo 'Snapshot Flow'
             def tag = "snapshot-$build"
             def artifact = builder.build(push: true, tag: tag, scm: scm)
-            deployer.deploy(artifact: artifact, environment: 'develop', tag: tag, auto: true)
+            deployer.deploy(artifact: artifact, environment: 'develop', auto: true)
             promoter.promote(branch: 'candidate')
         } else if (env.BRANCH_NAME == 'candidate') {
             echo 'Candidate Flow'
             def tag = "candidate-$build"
             def artifact = builder.build(push: true, tag: tag, scm: scm)
-            deployer.deploy(artifact: artifact, environment: 'staging', tag: tag)
+            deployer.deploy(artifact: artifact, environment: 'staging')
             promoter.promote(branch: 'release')
         } else if (env.BRANCH_NAME == 'release') {
             echo 'Release Flow'
             def tag = "release-$build"
             def artifact = builder.build(push: true, tag: tag, scm: scm)
-            deployer.deploy(artifact: artifact, environment: 'production', tag: tag)
+            deployer.deploy(artifact: artifact, environment: 'production')
         }
     } catch (ApproveStepRejected ignore) {
         currentBuild.result = 'SUCCESS'
