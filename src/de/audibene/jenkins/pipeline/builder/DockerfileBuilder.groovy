@@ -28,7 +28,7 @@ class DockerfileBuilder implements ArtifactBuilder {
     @Override
     String build(Map params = [:]) {
         String tag = params.tag
-        boolean verbose = params.get('verbose', true)
+        boolean verbose = params.get('verbose', false)
         Scm scm = requireNonNull(params.scm, 'DockerfileBuilder.build(params[scm]') as Scm
 
         def imageName = null
