@@ -7,7 +7,6 @@ class Git implements Scm{
     Git(script, config) {
         this.script = script
         this.config = config
-        this.script.git = this
     }
 
     @Override

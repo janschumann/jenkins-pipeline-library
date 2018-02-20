@@ -1,17 +1,22 @@
 package de.audibene.jenkins.pipeline.promoter
 
+import de.audibene.jenkins.pipeline.scm.Scm
+
+import static java.util.Objects.requireNonNull
+
 class GitBuildPromoter {
 
     private final def script
-    private final def scm
+    private final Scm scm
 
-    GitBuildPromoter(script, params = [:]) {
+    GitBuildPromoter(script, config = [:]) {
         this.script = script
-        this.scm = params.scm
+        this.scm = requireNonNull(config.scm, 'GitBuildPromoter.init(config[scm]') as Scm
+
     }
 
     def promote(Map params) {
-        def branch = params.branch
+        String branch = requireNonNull(params.branch, 'GitBuildPromoter.promote(params[branch])')
 
         script.approveStep("Promote to ${branch}?")
 

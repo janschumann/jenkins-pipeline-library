@@ -2,6 +2,8 @@ package de.audibene.jenkins.pipeline.builder
 
 import de.audibene.jenkins.pipeline.scm.Scm
 
+import static java.util.Objects.requireNonNull
+
 class DockerfileBuilder implements ArtifactBuilder {
 
     private final def script
@@ -12,6 +14,9 @@ class DockerfileBuilder implements ArtifactBuilder {
         this.script = script
         this.steps = steps
         this.artifact = artifact
+        requireNonNull(artifact.name, 'DockerfileBuilder.init(artifact[tag]')
+        requireNonNull(artifact.registry, 'DockerfileBuilder.init(artifact[tag]')
+
     }
 
     private def runStep(String name) {
@@ -27,8 +32,8 @@ class DockerfileBuilder implements ArtifactBuilder {
     String build(Map params = [:]) {
         boolean verbose = params.get('verbose', false)
         boolean push = params.get('push', false)
-        String tag = params.tag
-        Scm scm = params.scm
+        String tag = requireNonNull(params.tag, 'DockerfileBuilder.build(params[tag]') as String
+        Scm scm = requireNonNull(params.scm, 'DockerfileBuilder.build(params[scm]') as Scm
 
         def imageName = null
 
