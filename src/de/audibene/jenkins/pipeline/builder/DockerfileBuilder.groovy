@@ -30,7 +30,7 @@ class DockerfileBuilder implements ArtifactBuilder {
         script.echo "DockerfileBuilder arttifact: $artifact, params: $params"
 
         String tag = params.tag
-        boolean verbose = params.get('verbose', false)
+        boolean verbose = params.get('verbose', true)
         Scm scm = requireNonNull(params.scm, 'DockerfileBuilder.build(params[scm]') as Scm
 
         def imageName = null
