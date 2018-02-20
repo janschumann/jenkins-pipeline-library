@@ -27,7 +27,7 @@ class DockerfileBuilder implements ArtifactBuilder {
 
     @Override
     String build(Map params = [:]) {
-        script.echo "DockerfileBuilder arttifact: $artifact, params: $params"
+        script.echo "DockerfileBuilder.build with arttifact: $artifact, steps: $steps, params: $params"
 
         String tag = params.tag
         boolean verbose = params.get('verbose', true)
