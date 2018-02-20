@@ -1,7 +1,6 @@
 package de.audibene.jenkins.pipeline.docker
 
 import static java.util.Objects.requireNonNull
-import static java.util.Objects.toString
 
 class DockerImage {
     private def script
@@ -24,7 +23,6 @@ class DockerImage {
     }
 
     def inside(Closure body) {
-        script.echo "DockerImage.inside() on ${this.toString()}"
         if (config.beforeRun) {
             config.beforeRun()
         }
@@ -43,7 +41,6 @@ class DockerImage {
     }
 
     def around(Closure body) {
-        script.echo "DockerImage.around() on ${toString()}"
         def image = this
         if (config.beforeRun) {
             config.beforeRun()
@@ -61,12 +58,6 @@ class DockerImage {
         if (config.afterRun) {
             config.afterRun()
         }
-    }
-
-
-    @Override
-    String toString() {
-        return "DockerImage{config=$config}"
     }
 }
 

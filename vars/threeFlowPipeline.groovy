@@ -17,7 +17,6 @@ def call(body) {
 
 def pipeline(body) {
     def config = configure(body)
-    echo """threeFlowPipeline.call() on $config"""
     def buildTag = Long.toString(new Date().time, Character.MAX_RADIX)
     def builder = requireNonNull(config.builder, 'threeFlowPipeline(config[builder])') as ArtifactBuilder
     def deployer = requireNonNull(config.deployer, 'threeFlowPipeline(config[deployer])') as ArtifactDeployer

@@ -27,8 +27,6 @@ class DockerfileBuilder implements ArtifactBuilder {
 
     @Override
     String build(Map params = [:]) {
-        script.echo "DockerfileBuilder.build($params) on ${this.toString()}"
-
         String tag = params.tag
         boolean verbose = params.get('verbose', true)
         Scm scm = requireNonNull(params.scm, 'DockerfileBuilder.build(params[scm]') as Scm
@@ -78,11 +76,5 @@ class DockerfileBuilder implements ArtifactBuilder {
 
     def steps(Closure body) {
         script.configure(steps, body)
-    }
-
-
-    @Override
-    String toString() {
-        return "DockerfileBuilder{artifact=$artifact,steps=$steps}"
     }
 }
