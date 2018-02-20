@@ -14,9 +14,6 @@ class DockerfileBuilder implements ArtifactBuilder {
         this.script = script
         this.steps = steps
         this.artifact = artifact
-        requireNonNull(artifact.name, 'DockerfileBuilder.init(artifact[tag]')
-        requireNonNull(artifact.registry, 'DockerfileBuilder.init(artifact[tag]')
-
     }
 
     private def runStep(String name) {
@@ -73,6 +70,9 @@ class DockerfileBuilder implements ArtifactBuilder {
 
     def artifact(Closure body) {
         script.configure(artifact, body)
+        requireNonNull(artifact.name, 'DockerfileBuilder.init(artifact[name]')
+        requireNonNull(artifact.registry, 'DockerfileBuilder.init(artifact[registry]')
+
     }
 
     def steps(Closure body) {
