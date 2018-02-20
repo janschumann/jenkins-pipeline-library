@@ -31,7 +31,7 @@ class BeansTalkDeployer implements ArtifactDeployer {
             script.approveStep("Deploy to ${environment}?")
         }
 
-        script.lock(resource: "$application-$environment") {
+        script.lock(resource: "${script.env.JOB_NAME}:deploy:$environment") {
             script.buildNode {
                 script.deleteDir()
                 script.buildStep("Deploy to ${environment}") {
