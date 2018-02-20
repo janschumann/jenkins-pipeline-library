@@ -26,7 +26,15 @@ def pipeline(body) {
     def environments = config.environments ?: [snapshot: 'develop', candidate: 'staging', release: 'production']
 
     try {
-        if (env.BRANCH_NAME.startsWith('PR-')) {
+        if (env.BRANCH_NAME.startsWith('test-')) {
+            echo "Test flow"
+            buildNode {
+                scm.checkout()
+                tags = (sh('git tag --points-at HEAD')).split('\n')
+                echo "Tags: $tags"
+
+            }
+        } else if (env.BRANCH_NAME.startsWith('PR-')) {
             echo 'PR Flow'
             builder.build(verbose: true, scm: scm)
         } else if (env.BRANCH_NAME == branches.snapshot) {

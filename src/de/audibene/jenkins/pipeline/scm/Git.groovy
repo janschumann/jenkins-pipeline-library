@@ -18,8 +18,10 @@ class Git implements Scm {
 
     @Override
     def tag(String tag) {
-        execute "git tag -a $tag -m 'create tag: $tag'"
-        execute "git push origin --tags"
+        execute {
+            script.sh "git tag -a $tag -m 'create tag: $tag'"
+            script.sh "git push origin --tags"
+        }
     }
 
     @Override
@@ -27,13 +29,13 @@ class Git implements Scm {
         execute "git push origin HEAD:$branch"
     }
 
-    def execute(command) {
+    def execute(body) {
         script.buildNode {
             script.sh "git config user.name '${config.username}'"
             script.sh "git config user.email '${config.email}'"
 
             script.sshagent([config.credentials]) {
-                script.sh command
+                body()
             }
         }
     }
