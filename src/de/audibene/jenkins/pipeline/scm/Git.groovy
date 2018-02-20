@@ -10,14 +10,26 @@ class Git implements Scm {
     }
 
     @Override
-    def checkout() {
+    void checkout() {
         script.buildNode {
             script.checkout script.scm
         }
     }
 
     @Override
-    def tag(String tag) {
+    void checkout(final Closure body) {
+        script.buildNode {
+            script.checkout script.scm
+            try {
+                body()
+            } finally {
+                script.deleteDir()
+            }
+        }
+    }
+
+    @Override
+    void tag(String tag) {
         execute {
             script.sh "git tag -a $tag -m 'create tag: $tag'"
             script.sh "git push origin --tags"
@@ -25,11 +37,33 @@ class Git implements Scm {
     }
 
     @Override
-    def branch(String branch) {
-        execute "git push origin HEAD:$branch"
+    void branch(String branch) {
+        execute {
+            script.sh "git push origin HEAD:$branch"
+        }
     }
 
-    def execute(body) {
+    @Override
+    List<String> headTags() {
+        execute {
+            script.sh 'git tag -l | xargs git tag -d'
+            script.sh 'git fetch --tags'
+            String output = script.sh(returnStdout: true, script: 'git tag --list --points-at HEAD')
+            output.tokenize("\n").collect { it.trim() }
+        }
+    }
+
+    @Override
+    List<String> branchTags() {
+        execute {
+            script.sh 'git tag -l | xargs git tag -d'
+            script.sh 'git fetch --tags'
+            String output = script.sh(returnStdout: true, script: 'git tag --list --merged HEAD')
+            output.tokenize("\n").collect { it.trim() }
+        }
+    }
+
+    private <T> T execute(body) {
         script.buildNode {
             script.sh "git config user.name '${config.username}'"
             script.sh "git config user.email '${config.email}'"

@@ -1,7 +1,10 @@
 package de.audibene.jenkins.pipeline.scm
 
 interface Scm {
-    def checkout()
-    def tag(String tag)
-    def branch(String branch)
+    void checkout()
+    void checkout(Closure body)
+    void tag(String tag)
+    void branch(String branch)
+    List<String> headTags()
+    List<String> branchTags()
 }
