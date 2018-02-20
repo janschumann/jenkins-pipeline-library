@@ -31,34 +31,36 @@ class BeansTalkDeployer implements ArtifactDeployer {
             script.approveStep("Deploy to ${environment}?")
         }
 
-        script.buildNode {
-            script.deleteDir()
-            script.buildStep("Deploy to ${environment}") {
+        script.lock(resource: "$application-$environment") {
+            script.buildNode {
+                script.deleteDir()
+                script.buildStep("Deploy to ${environment}") {
 
-                script.writeFile file: 'Dockerrun.aws.json', text: new JsonBuilder([
-                        "AWSEBDockerrunVersion": "1",
-                        "Image"                : ["Name": artifact, "Update": true],
-                        "Ports"                : [["ContainerPort": "$port"]]
-                ]).toPrettyString()
+                    script.writeFile file: 'Dockerrun.aws.json', text: new JsonBuilder([
+                            "AWSEBDockerrunVersion": "1",
+                            "Image"                : ["Name": artifact, "Update": true],
+                            "Ports"                : [["ContainerPort": "$port"]]
+                    ]).toPrettyString()
 
-                script.step([
-                        $class                  : 'AWSEBDeploymentBuilder',
-                        credentialId            : config.get('credentialId', ''),
-                        awsRegion               : config.get('region'),
-                        applicationName         : application,
-                        environmentName         : environment,
-                        bucketName              : config.get('bucket', ''),
-                        keyPrefix               : config.get('keyPrefix', application),
-                        versionLabelFormat      : params.get('label', artifact.split('/').last()),
-                        versionDescriptionFormat: params.get('description', artifact),
-                        rootObject              : config.get('root', ''),
-                        includes                : config.get('includes', ''),
-                        excludes                : config.get('excludes', ''),
-                        zeroDowntime            : config.get('zeroDowntime', false),
-                        checkHealth             : config.get('checkHealth', true),
-                        sleepTime               : config.get('sleepTime', 10),
-                        maxAttempts             : config.get('maxAttempts', 10)
-                ])
+                    script.step([
+                            $class                  : 'AWSEBDeploymentBuilder',
+                            credentialId            : config.get('credentialId', ''),
+                            awsRegion               : config.get('region'),
+                            applicationName         : application,
+                            environmentName         : environment,
+                            bucketName              : config.get('bucket', ''),
+                            keyPrefix               : config.get('keyPrefix', application),
+                            versionLabelFormat      : params.get('label', artifact.split('/').last()),
+                            versionDescriptionFormat: params.get('description', artifact),
+                            rootObject              : config.get('root', ''),
+                            includes                : config.get('includes', ''),
+                            excludes                : config.get('excludes', ''),
+                            zeroDowntime            : config.get('zeroDowntime', false),
+                            checkHealth             : config.get('checkHealth', true),
+                            sleepTime               : config.get('sleepTime', 10),
+                            maxAttempts             : config.get('maxAttempts', 10)
+                    ])
+                }
             }
         }
     }
