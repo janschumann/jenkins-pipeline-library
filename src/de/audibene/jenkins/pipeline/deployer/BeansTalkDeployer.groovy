@@ -20,6 +20,7 @@ class BeansTalkDeployer implements ArtifactDeployer {
         String application = config.application
         String region = config.region
         Integer port = config.port
+        String bucket = config.bucket
         String simpleArtifact = artifact.split('/').last()
 
         if (!auto) {
@@ -51,7 +52,7 @@ class BeansTalkDeployer implements ArtifactDeployer {
                         awsRegion               : region,
                         applicationName         : application,
                         environmentName         : environment,
-                        bucketName              : '',
+                        bucketName              : "$bucket/$application",
                         keyPrefix               : '',
                         versionLabelFormat      : simpleArtifact,
                         versionDescriptionFormat: artifact,
