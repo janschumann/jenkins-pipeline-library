@@ -23,7 +23,7 @@ class DockerImage {
     }
 
     def inside(Closure body) {
-        script.echo "DockerImage.inside with config: $config"
+        script.echo "DockerImage.inside() on $this"
         if (config.beforeRun) {
             config.beforeRun()
         }
@@ -42,7 +42,7 @@ class DockerImage {
     }
 
     def around(Closure body) {
-        script.echo "DockerImage.around with config: $config"
+        script.echo "DockerImage.around() on $this"
         def image = this
         if (config.beforeRun) {
             config.beforeRun()
@@ -60,6 +60,12 @@ class DockerImage {
         if (config.afterRun) {
             config.afterRun()
         }
+    }
+
+
+    @Override
+    String toString() {
+        return "DockerImage{config=$config}"
     }
 }
 

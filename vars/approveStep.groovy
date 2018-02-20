@@ -11,11 +11,11 @@ def call(String name, Map params = [:]) {
 
     buildStep(name) {
         def approve = getApprove(time, unit, message, timeoutAs)
-
-        echo "Result is $approve"
+        def result = approve.result ? "approved" : "rejected"
+        echo "$name: $result by ${approve.userName}"
 
         if (!approve.result) {
-            stageStatus= 'ABORTED'
+            stageStatus = 'ABORTED'
             throw new ApproveStepRejected("Rejected by ${approve.userName}")
         }
     }

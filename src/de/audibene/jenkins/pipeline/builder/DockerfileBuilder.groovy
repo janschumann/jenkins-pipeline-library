@@ -7,13 +7,13 @@ import static java.util.Objects.requireNonNull
 class DockerfileBuilder implements ArtifactBuilder {
 
     private final def script
-    private final Map<String, Closure> steps
     private final Map<String, Object> artifact
+    private final Map<String, Closure> steps
 
     DockerfileBuilder(script, steps = [:], artifact = [:]) {
         this.script = script
-        this.steps = steps
         this.artifact = artifact
+        this.steps = steps
     }
 
     private def runStep(String name) {
@@ -27,7 +27,7 @@ class DockerfileBuilder implements ArtifactBuilder {
 
     @Override
     String build(Map params = [:]) {
-        script.echo "DockerfileBuilder.build with arttifact: $artifact, steps: $steps, params: $params"
+        script.echo "DockerfileBuilder.build($params) on $this"
 
         String tag = params.tag
         boolean verbose = params.get('verbose', true)
@@ -78,5 +78,11 @@ class DockerfileBuilder implements ArtifactBuilder {
 
     def steps(Closure body) {
         script.configure(steps, body)
+    }
+
+
+    @Override
+    String toString() {
+        return "DockerfileBuilder{artifact=$artifact,steps=$steps}"
     }
 }

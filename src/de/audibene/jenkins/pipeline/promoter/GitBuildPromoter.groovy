@@ -16,6 +16,8 @@ class GitBuildPromoter {
     }
 
     def promote(Map params) {
+        script.echo "GitBuildPromoter.promote($params) on $this"
+
         String branch = requireNonNull(params.branch, 'GitBuildPromoter.promote(params[branch])')
 
         script.approveStep("Promote to ${branch}?")
@@ -26,5 +28,11 @@ class GitBuildPromoter {
                 scm.branch(branch)
             }
         }
+    }
+
+
+    @Override
+    String toString() {
+        return "GitBuildPromoter{scm=$scm}"
     }
 }

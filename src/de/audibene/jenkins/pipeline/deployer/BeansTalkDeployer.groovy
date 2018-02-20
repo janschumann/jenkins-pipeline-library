@@ -20,6 +20,7 @@ class BeansTalkDeployer implements ArtifactDeployer {
 
     @Override
     def deploy(final Map params) {
+        script.echo "BeansTalkDeployer.build($params) on $this"
         def port = requireNonNull(config.port, "BeansTalkDeployer.init(config[port])")
         String application = requireNonNull(config.application, "BeansTalkDeployer.init(config[application])")
         String artifact = requireNonNull(params.artifact, "BeansTalkDeployer.deploy(params[artifact])")
@@ -61,5 +62,11 @@ class BeansTalkDeployer implements ArtifactDeployer {
                 ])
             }
         }
+    }
+
+
+    @Override
+    String toString() {
+        return "BeansTalkDeployer{config=$config}"
     }
 }
