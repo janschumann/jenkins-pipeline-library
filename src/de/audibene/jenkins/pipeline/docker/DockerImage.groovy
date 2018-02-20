@@ -8,6 +8,7 @@ class DockerImage {
 
     DockerImage(script, config) {
         this.script = script
+        this.config = config
         requireNonNull(config.id, 'DockerImage.init(config[id])')
     }
 
