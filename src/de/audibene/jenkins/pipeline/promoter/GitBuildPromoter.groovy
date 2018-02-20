@@ -16,7 +16,7 @@ class GitBuildPromoter {
     }
 
     def promote(Map params) {
-        script.echo "GitBuildPromoter.promote($params) on $this"
+        script.echo "GitBuildPromoter.promote($params) on ${this.toString()}"
 
         String branch = requireNonNull(params.branch, 'GitBuildPromoter.promote(params[branch])')
 
