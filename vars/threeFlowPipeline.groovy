@@ -29,10 +29,11 @@ def pipeline(body) {
         if (env.BRANCH_NAME.startsWith('test-')) {
             echo "Test flow"
             buildNode {
-                scm.checkout()
-                tags = (sh('git tag --points-at HEAD')).split('\n')
-                echo "Tags: $tags"
-
+                stage('Tags') {
+                    scm.checkout()
+                    tags = sh 'git tag --points-at HEAD'
+                    echo "Tags: $tags"
+                }
             }
         } else if (env.BRANCH_NAME.startsWith('PR-')) {
             echo 'PR Flow'
