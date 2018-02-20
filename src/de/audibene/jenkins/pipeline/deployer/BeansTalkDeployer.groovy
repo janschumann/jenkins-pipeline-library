@@ -1,5 +1,7 @@
 package de.audibene.jenkins.pipeline.deployer
 
+import static java.util.Objects.requireNonNull
+
 class BeansTalkDeployer implements ArtifactDeployer {
 
     private final def script
@@ -8,20 +10,19 @@ class BeansTalkDeployer implements ArtifactDeployer {
     BeansTalkDeployer(def script, config) {
         this.script = script
         this.config = config
+
+        requireNonNull(config.port, "BeansTalkDeployer.init(config[port])")
+        requireNonNull(config.region, "BeansTalkDeployer.init(config[region])")
+        requireNonNull(config.application, "BeansTalkDeployer.init(config[application])")
     }
 
     @Override
     def deploy(final Map params) {
-        script.echo "beanstalk config $config"
-        script.echo "beanstalk params $params"
-        String artifact = params.artifact
-        String environment = params.environment
+        String application = requireNonNull(config.application, "BeansTalkDeployer.init(config[application])")
+        String artifact = requireNonNull(params.artifact, "BeansTalkDeployer.deploy(params[artifact])")
+        String environment = requireNonNull(params.environment, "BeansTalkDeployer.deploy(params[environment])")
+
         boolean auto = params.get('auto', false)
-        String application = config.application
-        String region = config.region
-        Integer port = config.port
-        String bucket = config.bucket
-        String simpleArtifact = artifact.split('/').last()
 
         if (!auto) {
             script.approveStep("Deploy to ${environment}?")
@@ -40,33 +41,29 @@ class BeansTalkDeployer implements ArtifactDeployer {
                 |  },
                 |  "Ports": [
                 |    {
-                |      "ContainerPort": "${port}"
+                |      "ContainerPort": "${config.get('port')}"
                 |    }
                 |  ]
                 |}""".stripMargin()
 
-
-                def stepParams = [
+                script.step([
                         $class                  : 'AWSEBDeploymentBuilder',
-                        credentialId            : '',
-                        awsRegion               : region,
+                        credentialId            : config.get('credentialId', ''),
+                        awsRegion               : config.get('region'),
                         applicationName         : application,
                         environmentName         : environment,
-                        bucketName              : "$bucket/$application",
-                        keyPrefix               : '',
-                        versionLabelFormat      : simpleArtifact,
-                        versionDescriptionFormat: artifact,
-                        rootObject              : '',
-                        includes                : '',
-                        excludes                : '',
-                        zeroDowntime            : false,
-                        checkHealth             : true,
-                        sleepTime               : 10,
-                        maxAttempts             : 60
-                ]
-
-                script.echo "Do deploy $stepParams"
-                script.step(stepParams)
+                        bucketName              : config.get('bucket', ''),
+                        keyPrefix               : config.get('keyPrefix', application),
+                        versionLabelFormat      : params.get('label', artifact.split('/').last()),
+                        versionDescriptionFormat: params.get('description', artifact),
+                        rootObject              : config.get('root', ''),
+                        includes                : config.get('includes', ''),
+                        excludes                : config.get('excludes', ''),
+                        zeroDowntime            : config.get('zeroDowntime', false),
+                        checkHealth             : config.get('checkHealth', true),
+                        sleepTime               : config.get('sleepTime', 10),
+                        maxAttempts             : config.get('maxAttempts', 10)
+                ])
             }
         }
     }
