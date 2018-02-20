@@ -27,9 +27,8 @@ class DockerfileBuilder implements ArtifactBuilder {
 
     @Override
     String build(Map params = [:]) {
+        String tag = params.tag
         boolean verbose = params.get('verbose', false)
-        boolean push = params.get('push', false)
-        String tag = requireNonNull(params.tag, 'DockerfileBuilder.build(params[tag]') as String
         Scm scm = requireNonNull(params.scm, 'DockerfileBuilder.build(params[scm]') as Scm
 
         def imageName = null
@@ -49,7 +48,7 @@ class DockerfileBuilder implements ArtifactBuilder {
                 script.buildStep('Build', verbose) {
                     runStep('build')
                     def dockerImage = script.docker.build(artifact.name)
-                    if (push) {
+                    if (tag != null) {
                         script.docker.withRegistry(artifact.registry) {
                             loginEcrRepository()
                             dockerImage.push(tag)
