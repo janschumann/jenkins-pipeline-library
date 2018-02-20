@@ -51,7 +51,7 @@ class BeansTalkDeployer implements ArtifactDeployer {
                         awsRegion               : region,
                         applicationName         : application,
                         environmentName         : environment,
-                        bucketName              : application,
+                        bucketName              : '',
                         keyPrefix               : '',
                         versionLabelFormat      : simpleArtifact,
                         versionDescriptionFormat: artifact,
