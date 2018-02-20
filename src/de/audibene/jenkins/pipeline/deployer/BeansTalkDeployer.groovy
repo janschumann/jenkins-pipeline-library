@@ -1,5 +1,7 @@
 package de.audibene.jenkins.pipeline.deployer
 
+import groovy.json.JsonBuilder
+
 import static java.util.Objects.requireNonNull
 
 class BeansTalkDeployer implements ArtifactDeployer {
@@ -18,6 +20,7 @@ class BeansTalkDeployer implements ArtifactDeployer {
 
     @Override
     def deploy(final Map params) {
+        def port = requireNonNull(config.port, "BeansTalkDeployer.init(config[port])")
         String application = requireNonNull(config.application, "BeansTalkDeployer.init(config[application])")
         String artifact = requireNonNull(params.artifact, "BeansTalkDeployer.deploy(params[artifact])")
         String environment = requireNonNull(params.environment, "BeansTalkDeployer.deploy(params[environment])")
@@ -32,19 +35,11 @@ class BeansTalkDeployer implements ArtifactDeployer {
             script.deleteDir()
             script.buildStep("Deploy to ${environment}") {
 
-                script.writeFile file: 'Dockerrun.aws.json', text: """
-                |{
-                |  "AWSEBDockerrunVersion": "1",
-                |  "Image": {
-                |    "Name": "$artifact",
-                |    "Update":true
-                |  },
-                |  "Ports": [
-                |    {
-                |      "ContainerPort": "${config.get('port')}"
-                |    }
-                |  ]
-                |}""".stripMargin()
+                script.writeFile file: 'Dockerrun.aws.json', text: new JsonBuilder([
+                        "AWSEBDockerrunVersion": "1",
+                        "Image"                : ["Name": artifact, "Update": true],
+                        "Ports"                : [["ContainerPort": "$port"]]
+                ]).toPrettyString()
 
                 script.step([
                         $class                  : 'AWSEBDeploymentBuilder',
