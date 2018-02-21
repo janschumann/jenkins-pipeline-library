@@ -2,9 +2,8 @@ package de.audibene.jenkins.pipeline.builder
 
 interface ArtifactBuilder extends Serializable{
 
-    /**
-     * @return built artifact id
-     */
-    String build(Map parameters)
+    String build(String tag, boolean verbose)
+
+    String retag(String tag, String previousTag)
 
 }

@@ -19,7 +19,7 @@ class Git implements Scm {
     }
 
     @Override
-    void checkout(final Closure body) {
+    <T> T checkout(final Closure body) {
         script.buildNode {
             script.checkout script.scm
             try {
@@ -33,15 +33,14 @@ class Git implements Scm {
     @Override
     void tag(String tag) {
         execute {
-            script.sh "git tag -a $tag -m 'create tag: $tag'"
-            script.sh "git push origin --tags"
+            script.sh "git push origin HEAD:refs/tags/$tag"
         }
     }
 
     @Override
     void branch(String branch) {
         execute {
-            script.sh "git push origin HEAD:$branch"
+            script.sh "git push origin HEAD:refs/heads/$branch"
         }
     }
 

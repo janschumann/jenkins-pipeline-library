@@ -2,7 +2,8 @@ package de.audibene.jenkins.pipeline.promoter
 
 import de.audibene.jenkins.pipeline.scm.Scm
 
-import static java.util.Comparator.reverseOrder
+import static de.audibene.jenkins.pipeline.Milestones.BUILD
+import static de.audibene.jenkins.pipeline.Milestones.PROMOTE
 import static java.util.Objects.requireNonNull
 
 class FlowManager {
@@ -16,27 +17,51 @@ class FlowManager {
     }
 
     def promote(Map params) {
-        String branch = requireNonNull(params.branch, 'FlowManager.promote(params[branch])')
-        String title = params.get('title', "Promote to ${branch}")
+        script.milestone(ordinal: PROMOTE + 100)
 
-        script.approveStep("$title?")
+
+        List<String> branches = params.branches ?: []
+        if (branches.empty) {
+            String branch = requireNonNull(params.branch, 'FlowManager.promote(params[branch])')
+            branches.add(branch)
+        }
+
+        String title = params.get('title', "Promote to ${branches.first()}")
+
+        if (!params.get('auto', false)) {
+            script.approveStep("$title?")
+        }
+
+        script.milestone(ordinal: PROMOTE + 200)
 
         script.buildStep(title) {
             scm.checkout {
+                script.milestone(ordinal: PROMOTE + 300)
+
                 if (params.get('start', false)) {
                     boolean allowStarted = params.get('allowStarted', true)
                     String increment = params.get('increment', '0.1.0')
                     startVersion(allowStarted, increment)
                 }
 
+                script.milestone(ordinal: PROMOTE + 400)
+
                 if (params.get('finish', false)) {
                     boolean allowFinished = params.get('allowFinished', true)
                     finishVersion(allowFinished)
                 }
 
-                scm.branch(branch)
+                script.milestone(ordinal: PROMOTE + 500)
+
+                for (String branch : branches) {
+                    scm.branch(branch)
+                }
+
+                script.milestone(ordinal: PROMOTE + 600)
             }
         }
+
+
     }
 
     def resolveVersion(Map params = [:]) {
@@ -59,10 +84,26 @@ class FlowManager {
         }
     }
 
+    def resolveHeadTag(boolean required = false, String... candidates) {
+        scm.checkout {
+            List<String> tags = scm.headTags()
+            for (String candidate : candidates) {
+                def tag = tags.findAll { it.startsWith(candidate) }.max()
+                if (tag) {
+                    return tag
+                }
+            }
+            if (required) {
+                throw new IllegalStateException("There is no head tags matched by $candidates")
+            } else {
+                return null
+            }
+        }
+    }
+
     private resolveVersionTag() {
-        List<String> versionTags = scm.branchTags().findAll { it.startsWith('version') }.toSorted(reverseOrder())
-        String versionTag = versionTags.find() ?: 'initial'
-        return versionTag
+        List<String> versionTags = scm.branchTags().findAll { it.startsWith('version') }
+        return versionTags.max() ?: 'initial'
     }
 
     private void finishVersion(boolean allowFinished) {
