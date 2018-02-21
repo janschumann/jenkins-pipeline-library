@@ -10,10 +10,9 @@ class FlowManager {
     private final def script
     private final Scm scm
 
-    FlowManager(script, config = [:]) {
+    FlowManager(script, Scm scm) {
         this.script = script
-        this.scm = requireNonNull(config.scm, 'FlowManager.init(config[scm]') as Scm
-
+        this.scm = scm
     }
 
     def promote(Map params) {
@@ -109,6 +108,12 @@ class FlowManager {
         }
 
         return versions.join('.')
+    }
+
+    FlowManager validated() {
+        requireNonNull(script, 'FlowManager.script')
+        requireNonNull(scm, 'FlowManager.scm')
+        return this
     }
 
 }

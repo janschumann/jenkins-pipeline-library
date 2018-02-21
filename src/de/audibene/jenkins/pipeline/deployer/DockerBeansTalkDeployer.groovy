@@ -4,26 +4,22 @@ import groovy.json.JsonBuilder
 
 import static java.util.Objects.requireNonNull
 
-class BeansTalkDeployer implements ArtifactDeployer {
+class DockerBeansTalkDeployer implements ArtifactDeployer {
 
     private final def script
     private final Map config
 
-    BeansTalkDeployer(def script, config) {
+    DockerBeansTalkDeployer(def script, config) {
         this.script = script
         this.config = config
-
-        requireNonNull(config.port, "BeansTalkDeployer.init(config[port])")
-        requireNonNull(config.region, "BeansTalkDeployer.init(config[region])")
-        requireNonNull(config.application, "BeansTalkDeployer.init(config[application])")
     }
 
     @Override
     def deploy(final Map params) {
-        def port = requireNonNull(config.port, "BeansTalkDeployer.init(config[port])")
-        String application = requireNonNull(config.application, "BeansTalkDeployer.init(config[application])")
-        String artifact = requireNonNull(params.artifact, "BeansTalkDeployer.deploy(params[artifact])")
-        String environment = requireNonNull(params.environment, "BeansTalkDeployer.deploy(params[environment])")
+        String application = config.application
+
+        String artifact = requireNonNull(params.artifact, "DockerBeansTalkDeployer.deploy(params[artifact])")
+        String environment = requireNonNull(params.environment, "DockerBeansTalkDeployer.deploy(params[environment])")
 
         boolean auto = params.get('auto', false)
 
@@ -39,7 +35,7 @@ class BeansTalkDeployer implements ArtifactDeployer {
                     script.writeFile file: 'Dockerrun.aws.json', text: new JsonBuilder([
                             "AWSEBDockerrunVersion": "1",
                             "Image"                : ["Name": artifact, "Update": true],
-                            "Ports"                : [["ContainerPort": "$port"]]
+                            "Ports"                : [["ContainerPort": "${config.port}"]]
                     ]).toPrettyString()
 
                     script.step([
@@ -63,5 +59,13 @@ class BeansTalkDeployer implements ArtifactDeployer {
                 }
             }
         }
+    }
+
+    DockerBeansTalkDeployer validated() {
+        requireNonNull(script, "DockerBeansTalkDeployer.script")
+        requireNonNull(config.port, "DockerBeansTalkDeployer.config.port")
+        requireNonNull(config.region, "DockerBeansTalkDeployer.config.region")
+        requireNonNull(config.application, "DockerBeansTalkDeployer.config.application")
+        return this
     }
 }

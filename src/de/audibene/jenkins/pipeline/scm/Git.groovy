@@ -1,10 +1,12 @@
 package de.audibene.jenkins.pipeline.scm
 
+import static java.util.Objects.requireNonNull
+
 class Git implements Scm {
     private final def script
     private final Map config
 
-    Git(script, config) {
+    Git(script, Map config) {
         this.script = script
         this.config = config
     }
@@ -72,5 +74,12 @@ class Git implements Scm {
                 body()
             }
         }
+    }
+
+    Git validated() {
+        requireNonNull(config.credentials, 'Git.config.credentials')
+        requireNonNull(config.username, 'Git.config.username')
+        requireNonNull(config.email, 'Git.config.email')
+        return this
     }
 }

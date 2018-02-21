@@ -14,30 +14,28 @@ class DockerImage {
     ]
 
     private def script
-    private Map<String, ?> config
+    private final String id
+    private final String args
+    private Map<String, ?> hooks
 
-    private DockerImage(def script, Map config) {
+    private DockerImage(script, String id, String args, Map hooks) {
         this.script = script
-        this.config = config
-        requireNonNull(config.id, 'DockerImage.init(config[id])')
-        requireNonNull(config.args, 'DockerImage.init(config[args])')
-        for(String hook: HOOK_NAMES) {
-            requireNonNull(config[hook], "DockerImage.init(config[${hook}])")
-        }
+        this.id = id
+        this.args = args
+        this.hooks = hooks
     }
 
-    static DockerImage create(def script, Map config) {
-        config.args = config.args ?: ''
+    static DockerImage create(script, Map config) {
+        String args = config.remove('args')
+        String id = config.remove('id')
         for (String name : HOOK_NAMES) {
             config[name] = config.get(name, {})
         }
-        return new DockerImage(script, config)
+        return new DockerImage(script, id, args, config).validated()
     }
 
-    def args(args = '') {
-        Map config = this.config.clone() as Map
-        config.args = "${config.args} ${args}".trim()
-        return new DockerImage(script, config)
+    def args(extra = '') {
+        return new DockerImage(script, id, "${args} ${extra}".trim(), new LinkedHashMap(hooks))
     }
 
     def link(String name, String id) {
@@ -57,24 +55,33 @@ class DockerImage {
     }
 
     def inside(Closure body) {
-        config.beforeRun()
-        script.docker.image(config.id).inside(config.args) {
-            config.beforeInside()
+        hooks.beforeRun()
+        script.docker.image(id).inside(args) {
+            hooks.beforeInside()
             body()
-            config.afterInside()
+            hooks.afterInside()
         }
-        config.afterRun()
+        hooks.afterRun()
     }
 
     def around(Closure body) {
         def image = this
-        config.beforeRun()
-        script.docker.image(config.id).withRun(config.args) { container ->
-            config.beforeAround(container.id, image)
+        hooks.beforeRun()
+        script.docker.image(id).withRun(args) { container ->
+            hooks.beforeAround(container.id, image)
             body(container.id, image)
-            config.afterAround(container.id, image)
+            hooks.afterAround(container.id, image)
         }
-        config.afterRun()
+        hooks.afterRun()
+    }
+
+    DockerImage validated() {
+        requireNonNull(id, 'DockerImage.id')
+        requireNonNull(args, 'DockerImage.args')
+        for(String hook: HOOK_NAMES) {
+            requireNonNull(hooks[hook], "DockerImage.hooks.${hook}")
+        }
+        return this
     }
 }
 

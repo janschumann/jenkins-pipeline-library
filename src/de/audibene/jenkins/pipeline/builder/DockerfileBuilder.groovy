@@ -2,16 +2,21 @@ package de.audibene.jenkins.pipeline.builder
 
 import de.audibene.jenkins.pipeline.scm.Scm
 
+import static de.audibene.jenkins.pipeline.Configurers.configure
+import static de.audibene.jenkins.pipeline.Configurers.configure
 import static java.util.Objects.requireNonNull
 
 class DockerfileBuilder implements ArtifactBuilder {
 
     private final def script
+    private final Scm scm
+
     private final Map<String, Object> artifact
     private final Map<String, Closure> steps
 
-    DockerfileBuilder(script, steps = [:], artifact = [:]) {
+    DockerfileBuilder(def script, Scm scm, Map steps = [:], Map artifact = [:]) {
         this.script = script
+        this.scm = scm
         this.artifact = artifact
         this.steps = steps
     }
@@ -19,16 +24,15 @@ class DockerfileBuilder implements ArtifactBuilder {
     @Override
     String build(Map params = [:]) {
         String tag = params.tag
-        List<String> retag = params.get('retag', []) as List<String>
+        List<String> retagPrefixes = params.get('retag', []) as List<String>
         boolean verbose = params.get('verbose', false)
-        Scm scm = requireNonNull(params.scm, 'DockerfileBuilder.build(params[scm]') as Scm
 
         def imageName = null
 
         script.buildNode('ecs') {
             script.buildStep('Build', !verbose) {
                 scm.checkout {
-                    def existed = retag ? existedTag(scm, retag) : null
+                    def existed = retagPrefixes ? existedTag(retagPrefixes) : null
                     imageName = existed ? doRetag(tag, verbose, existed) : null
                     imageName = imageName ?: doBuild(tag, verbose)
                     scm.tag(tag)
@@ -39,9 +43,9 @@ class DockerfileBuilder implements ArtifactBuilder {
         return imageName
     }
 
-    private String existedTag(Scm scm, List<String> candidates) {
+    private String existedTag(List<String> prefixes) {
         List<String> tags = scm.headTags()
-        for (def candidate : candidates) {
+        for (def candidate : prefixes) {
             def tag = tags.findAll { it.startsWith(candidate) }.max()
             if (tag) return tag
         }
@@ -96,14 +100,23 @@ class DockerfileBuilder implements ArtifactBuilder {
         script.sh script.ecrLogin()
     }
 
-    def artifact(Closure body) {
-        script.configure(artifact, body)
-        requireNonNull(artifact.name, 'DockerfileBuilder.init(artifact[name]')
-        requireNonNull(artifact.registry, 'DockerfileBuilder.init(artifact[registry]')
-
+    def artifact(Closure artifactBody) {
+        configure(artifact, artifactBody)
     }
 
-    def steps(Closure body) {
-        script.configure(steps, body)
+    def steps(Closure stepsBody) {
+        configure(steps, stepsBody)
+    }
+
+    DockerfileBuilder validated() {
+        requireNonNull(script, 'DockerfileBuilder.script')
+        requireNonNull(scm, 'DockerfileBuilder.scm')
+        requireNonNull(steps, 'DockerfileBuilder.steps')
+
+        requireNonNull(artifact, 'DockerfileBuilder.artifact')
+        requireNonNull(artifact.name, 'DockerfileBuilder.artifact.name')
+        requireNonNull(artifact.registry, 'DockerfileBuilder.artifact.registry')
+
+        return this
     }
 }
