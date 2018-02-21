@@ -1,60 +1,81 @@
 #!groovy
 import de.audibene.jenkins.pipeline.builder.ArtifactBuilder
-import de.audibene.jenkins.pipeline.builder.DockerfileBuilder
+import de.audibene.jenkins.pipeline.builder.SimpleArtifactBuilder
 import de.audibene.jenkins.pipeline.deployer.ArtifactDeployer
-import de.audibene.jenkins.pipeline.deployer.DockerBeansTalkDeployer
+import de.audibene.jenkins.pipeline.deployer.BeansTalkDeployer
 import de.audibene.jenkins.pipeline.exception.ApproveStepRejected
 import de.audibene.jenkins.pipeline.promoter.FlowManager
 import de.audibene.jenkins.pipeline.scm.Git
 import de.audibene.jenkins.pipeline.scm.Scm
 
 import static de.audibene.jenkins.pipeline.Configurers.configure
-
 import static java.util.Objects.requireNonNull
 
-def call(body) {
+def call(Closure body) {
     timestamps {
         pipeline(body)
     }
 }
 
-def pipeline(body) {
-    def buildTag = Long.toString(new Date().time, Character.MAX_RADIX)
+def pipeline(Closure body) {
+    def buildId = Long.toString(new Date().time, Character.MAX_RADIX)
 
     FlowConfig config = configure(new FlowConfig(this), body).validate()
+
+    env.DEFAULT_NODE_NAME = config.node ?: 'master'
 
     def builder = config.builder
     def deployer = config.deployer
     def branches = config.branches
     def environments = config.environments
-    def flowManager = new FlowManager(this, config.scm)
+    def scm = config.scm
+    def flowManager = new FlowManager(this, scm).validated()
+
+    def pullRequestFlow = {
+        echo 'PR Flow'
+        builder.build(null, true)
+    }
+
+    def snapshotFlow = {
+        echo 'Snapshot Flow'
+        String buildTag = "snapshot-$buildId"
+        String artifact = builder.build(buildTag, false)
+        deployer.deploy(artifact: artifact, environment: environments.snapshot, auto: true)
+        flowManager.promote(title: 'Create Candidate', branch: branches.candidate, start: true)
+    }
+
+    def candidateFlow = {
+        echo 'Candidate Flow'
+        String version = flowManager.resolveVersion()
+        String headTag = flowManager.resolveHeadTag('candidate', 'snapshot')
+        String buildTag = "candidate-$version-$buildId"
+        String artifact = headTag ? builder.retag(buildTag, headTag) : builder.build(buildTag, false)
+        deployer.deploy(artifact: artifact, environment: environments.candidate)
+        List<String> promoteBranches = [branches.release, "backmerge/$version"]
+        flowManager.promote(title: 'Create Release', branches: promoteBranches, finish: true)
+    }
+
+    def releaseFlow = {
+        echo 'Release Flow'
+        String version = flowManager.resolveVersion(finished: true)
+        String headTag = flowManager.resolveHeadTag(true, 'release', 'candidate')
+        String buildTag = "release-$version-$buildId"
+        String artifact = builder.retag(buildTag, headTag)
+        deployer.deploy(artifact: artifact, environment: environments.release)
+    }
 
     try {
         if (env.BRANCH_NAME.startsWith('PR-')) {
-            echo 'PR Flow'
-            builder.build(verbose: true)
+            pullRequestFlow()
         } else if (env.BRANCH_NAME == branches.snapshot) {
-            echo 'Snapshot Flow'
-            def tag = "snapshot-$buildTag"
-            def artifact = builder.build(tag: tag)
-            deployer.deploy(artifact: artifact, environment: environments.snapshot, auto: true)
-            flowManager.promote(title: 'Create Candidate', branch: branches.candidate, start: true)
+            snapshotFlow()
         } else if (env.BRANCH_NAME == branches.candidate) {
-            echo 'Candidate Flow'
-            def version = flowManager.resolveVersion()
-            def tag = "candidate-$version-$buildTag"
-            def artifact = builder.build(tag: tag, retag: ['candidate', 'snapshot'])
-            deployer.deploy(artifact: artifact, environment: environments.candidate)
-            flowManager.promote(title: 'Create Release', branch: branches.release, finish: true)
+            candidateFlow()
         } else if (env.BRANCH_NAME == branches.release) {
-            echo 'Release Flow'
-            def version = flowManager.resolveVersion(finished: true)
-            def tag = "release-$version-$buildTag"
-            def artifact = builder.build(tag: tag, retag: ['release', 'candidate'])
-            deployer.deploy(artifact: artifact, environment: environments.release)
+            releaseFlow()
         }
     } catch (ApproveStepRejected ignore) {
-        currentBuild.result = 'SUCCESS'
+        currentBuild.result = 'NOT_BUILT'
     }
 
 }
@@ -62,6 +83,7 @@ def pipeline(body) {
 class FlowConfig {
     def script
     Scm scm
+    String node
     ArtifactBuilder builder
     ArtifactDeployer deployer
     Map<String, String> branches = [snapshot: 'develop', candidate: 'candidate', release: 'master']
@@ -77,14 +99,14 @@ class FlowConfig {
         scm = new Git(script, config).validated()
     }
 
-    def dockerfileBuilder(Closure body) {
-        DockerfileBuilder builder = new DockerfileBuilder(script, scm)
+    def stages(Closure body) {
+        def builder = new SimpleArtifactBuilder(script, scm)
         this.builder = configure(builder, body).validated()
     }
 
-    def dockerBeansTalkDeployer(Closure body) {
+    def beansTalk(Closure body) {
         def config = configure(body)
-        def deployer = new DockerBeansTalkDeployer(script, config)
+        def deployer = new BeansTalkDeployer(script, config)
         this.deployer = deployer.validated()
     }
 
