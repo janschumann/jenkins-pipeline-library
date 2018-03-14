@@ -36,6 +36,12 @@ def pipeline(Closure body) {
         builder.build(null, true)
     }
 
+    def artifactFlow = {
+        echo 'Artifact Flow'
+        String artifact = builder.build(null, true)
+        echo artifact
+    }
+
     def snapshotFlow = {
         echo 'Snapshot Flow'
         String buildTag = "snapshot-$buildId"
@@ -73,7 +79,10 @@ def pipeline(Closure body) {
             candidateFlow()
         } else if (env.BRANCH_NAME == branches.release) {
             releaseFlow()
+        } else {
+            artifactFlow()
         }
+
     } catch (ApproveStepRejected ignore) {
         currentBuild.result = 'NOT_BUILT'
     }
