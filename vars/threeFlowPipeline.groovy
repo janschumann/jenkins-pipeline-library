@@ -38,7 +38,7 @@ def pipeline(Closure body) {
 
     def artifactFlow = {
         echo 'Artifact Flow'
-        String artifact = builder.build(null, true)
+        String artifact = builder.build('foo', true)
         echo artifact
     }
 
