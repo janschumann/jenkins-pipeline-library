@@ -94,6 +94,7 @@ class SimpleArtifactBuilder implements ArtifactBuilder {
 
     private void execute(context, String name) {
         if (steps[name]) {
+            throw new RuntimeException(context.tag)
             configure(context, steps[name])
             throw new RuntimeException(context.tag)
         }
